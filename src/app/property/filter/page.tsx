@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { instance as axios } from '@/lib/axiosConfig';
 import { Env } from '@/lib/Env';
@@ -36,7 +36,7 @@ interface PropertySchema {
     createdAt: string;
 }
 
-const Filter = () => {
+function PropertyFilterPage() {
     const searchParams = useSearchParams();
     const searchTerm = searchParams.get('searchTerm');
     const [properties, setProperties] = useState<PropertySchema[]>([]);
@@ -85,6 +85,12 @@ const Filter = () => {
             </div>
         </div>
     );
+    
 };
-
-export default Filter;
+export default function PropertyFilter() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <PropertyFilterPage />
+        </Suspense>
+    );
+}

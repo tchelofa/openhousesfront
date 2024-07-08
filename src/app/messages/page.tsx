@@ -21,7 +21,7 @@ interface Conversation {
   lastMessage: string;
 }
 
-const Messages = () => {
+function MessagesPage(){
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -163,4 +163,10 @@ function getMessageStatusText(status: 'SENT' | 'DELIVERED' | 'READ') {
   }
 }
 
-export default Messages;
+export default function Messages() {
+  return (
+      <Suspense fallback={<div>Loading...</div>}>
+          <MessagesPage />
+      </Suspense>
+  );
+}

@@ -2,32 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+.table-container {
+    overflow-x: auto;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+.table th, .table td {
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.table th {
+    background-color: #edf2f7;
+    font-weight: bold;
+    text-align: left;
+}
+
+.table tbody tr:hover {
+    background-color: #f7fafc;
+}
+
+.table tbody td {
+    vertical-align: top;
+}
+
+.carouselItem {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px; /* Adjust the height as needed */
+    background-color: #f0f0f0; /* Background color to show when image doesn't cover entire area */
+}
+
+.carouselImage {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain; /* Ensures the image is contained within the given dimensions */
 }

@@ -1,0 +1,317 @@
+'use client'
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { FaBars, FaTimes } from "react-icons/fa";
+import LinkHeader from "./LinkHeader";
+import { TiHeartOutline } from "react-icons/ti";
+import { HiOutlineBellAlert } from "react-icons/hi2";
+import { RiMessageLine } from "react-icons/ri";
+import { BsHouses } from "react-icons/bs";
+import axios from "axios";
+import { Env } from "@/lib/Env";
+
+interface PropertySchema {
+    id: number;
+    publicId: string;
+    title: string;
+    description: string;
+    address: string;
+    neighborhood: string;
+    city: string;
+    county: string;
+    country: string;
+    postcode: string;
+    price: string;
+    propertyType: string;
+    rooms: string;
+    capacity: string;
+    toilets: string;
+    externalArea: string; // Considerar mudar para boolean
+    electricityFee: string;
+    wifiFee: string;
+    rubbishFee: string;
+    depositFee: string;
+    timeRefundDeposit: string;
+    availableAtInit: string;
+    availableAtEnd: string;
+    active: boolean;
+    userId: string;
+    updatedAt: string;
+    createdAt: string;
+}
+
+export default function Header() {
+    const router = useRouter();
+    const [activeItem, setActiveItem] = useState("");
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [userName, setUserName] = useState(null); // Estado para armazenar o nome do usuário
+    const [cities, setCities] = useState<string[]>([]); // Estado para armazenar as cidades disponíveis
+
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    const handleClick = (id: string) => {
+        if (activeItem === id) {
+            setActiveItem(""); // Fecha a div se clicar no mesmo link novamente
+        } else {
+            setActiveItem(id); // Abre a div correspondente ao link clicado
+        }
+    };
+
+    const handleClickOutside = (event: MouseEvent) => {
+        if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+            setActiveItem("");
+        }
+    };
+
+    const handleSignIn = () => {
+        router.push('/auth/signin');
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('id');
+        setUserName(null);
+        router.push('/');
+    };
+
+    useEffect(() => {
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const id = localStorage.getItem("id")
+                    const tokenResponse = await axios.post(`${Env.baseurl}/auth/token-validate`, { token }, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (tokenResponse.status === 200) {
+                        const userResponse = await axios.get(`${Env.baseurl}/users/${id}`, {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        setUserName(userResponse.data.name);
+                    }
+                } catch (error) {
+                    console.error('Error fetching user data:', error);
+                    localStorage.removeItem('token');
+                }
+            }
+        };
+
+        fetchUserData();
+
+    }, []);
+
+
+
+    const fetchCities = async () => {
+        try {
+            const propertiesResponse = await axios.get<{ properties: PropertySchema[] }>(`${Env.baseurl}/properties`);
+            const properties = propertiesResponse.data.properties;
+    
+            if (Array.isArray(properties)) {
+                const uniqueCities = Array.from(new Set(properties.map(property => property.city)));
+                setCities(uniqueCities);
+            } else {
+                console.error('Response data is not an array:', propertiesResponse.data);
+            }
+        } catch (error) {
+            console.error('Error fetching properties:', error);
+        }
+    }
+    
+    useEffect(() => {    
+        fetchCities();
+    }, []);
+
+    return (
+        <header className="p-4 shadow-md flex items-center justify-between">
+            <div>
+                <a href="/"><img src="/logo.png" alt="Logo" className="w-64" /></a>
+            </div>
+            <div className="md:hidden">
+                <button onClick={() => setSidebarOpen(true)}>
+                    <FaBars className="w-6 h-6" />
+                </button>
+            </div>
+            <nav className="hidden md:flex items-center gap-4" ref={menuRef}>
+                {/* Links for larger screens */}
+                <LinkHeader title="RENT" onClick={() => handleClick("RENT")}>
+                    <div id="RENT" className={activeItem === "RENT" ? `p-10 absolute top-16 left-0 min-w-52 bg-white shadow-md` : `hidden`}>
+                        <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">City</h1>
+                        <ul className="flex flex-col gap-8">
+                            {cities.map(city => (
+                                <li key={city}>{city}</li>
+                            ))}
+                        </ul>
+                    </div>
+                </LinkHeader>
+                <LinkHeader title="SELL" onClick={() => handleClick("SELL")}>
+                    <div id="SELL" className={activeItem === "SELL" ? `p-10 absolute top-16 left-0 min-w-52 bg-white shadow-md` : `hidden`}>
+                        <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">City</h1>
+                        <ul className="flex flex-col gap-8">
+                            {cities.map(city => (
+                                <li key={city}>{city}</li>
+                            ))}
+                        </ul>
+                    </div>
+                </LinkHeader>
+
+                <LinkHeader title="ADVERTISE" onClick={() => handleClick("ADVERTISE")}>
+                    <div id="ADVERTISE" className={activeItem == "ADVERTISE" ? `p-10 absolute top-16 left-0 w-[400px] bg-white shadow-md` : `hidden`}>
+                        <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">Advertise on OpenHouses</h1>
+                        <ul className="flex flex-col gap-8">
+                            <li><a href="/auth/register/advertisor">Advertise Houses</a></li>
+                            <li><a href="/auth/register/advertisor">Advertise Flats</a></li>
+                            <li><a href="/auth/register/advertisor">Advertise Single Room</a> </li>
+                            <li><a href="/auth/register/advertisor">Advertise Shared Room</a> </li>
+                            <li><a href="/auth/register/advertisor">Advertise Double Room</a> </li>
+                        </ul>
+                    </div>
+                </LinkHeader>
+                <LinkHeader title="USEFULL LINKS" onClick={() => handleClick("USEFULL")}>
+                    <div id="USEFULL" className={activeItem == "USEFULL" ? `p-10 absolute top-16 left-0 min-w-52 bg-white shadow-md` : `hidden`}>
+                        <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">Utilities</h1>
+                        <ul className="flex flex-col gap-8">
+                            <li><a href="https://www.rtb.ie" target="_blank">Residential Tenancies Board</a></li>
+                        </ul>
+                    </div>
+                </LinkHeader>
+                <LinkHeader title="HELP" onClick={() => handleClick("HELP")}>
+                    <div id="HELP" className={activeItem == "HELP" ? `p-10 absolute top-16 left-0 min-w-64 bg-white shadow-md` : `hidden`}>
+                        <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">Ask your questions</h1>
+                        <ul className="flex flex-col gap-8">
+                            <li><a href="/use-terms">Use Terms</a></li>
+                            <li>Frequently Asked Questions</li>
+                            <li>About OpenHouses</li>
+                        </ul>
+                    </div>
+                </LinkHeader>
+                <LinkHeader signin={true} title={userName ? userName : "SIGN IN"} onClick={() => handleClick("SIGNIN")}>
+                    <div id="SIGNIN" className={activeItem == "SIGNIN" ? `p-10 absolute top-16 right-0 min-w-96 bg-white shadow-md z-50` : `hidden`}>
+                        {userName ? (
+                            <>
+                                <h4 className="text-sm mb-4">Welcome, {userName}</h4>
+                                <button className="bg-red-600 text-white w-full p-4 mb-4 rounded-md hover:bg-red-800" onClick={handleLogout}>Logout</button>
+                                <ul className="flex flex-col gap-8">
+                                    <li className="flex items-center gap-4"><TiHeartOutline /> <a href="/favorites">Favorites and Lists</a></li>
+                                    <li className="flex items-center gap-4"><HiOutlineBellAlert />Alerts Created</li>
+                                    <li className="flex items-center gap-4"><BsHouses /> <a href="/property/myproperties">My Properties</a></li>
+                                    <li className="flex items-center gap-4"><RiMessageLine /> <a href="/messages">Messages</a></li>
+                                </ul>
+                            </>
+                        ) : (
+                            <>
+                                <h4 className="text-sm mb-4">Log in to see your favorites, visits, proposals and rentals</h4>
+                                <button className="bg-sky-700 text-white w-full p-4 mb-4 rounded-md hover:bg-sky-900" onClick={handleSignIn}>Sign In / Register</button>
+                                <ul className="flex flex-col gap-8">
+                                </ul>
+                            </>
+                        )}
+                    </div>
+                </LinkHeader>
+            </nav>
+            {sidebarOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden" onClick={() => setSidebarOpen(false)}>
+                    <div className="fixed inset-y-0 left-0 w-2/3 bg-white shadow-md p-4" ref={menuRef} onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between mb-4">
+                            <img src="/logo.png" alt="Logo" className="w-48" />
+                            <button onClick={() => setSidebarOpen(false)}>
+                                <FaTimes className="w-6 h-6" />
+                            </button>
+                        </div>
+                        <nav className="flex flex-col gap-4">
+                            <LinkHeader title="RENT" onClick={() => handleClick("RENT")}>
+                                <div id="RENT" className={activeItem === "RENT" ? `p-10 absolute top-16 left-0 min-w-52 bg-white shadow-md` : `hidden`}>
+                                    <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">City</h1>
+                                    <ul className="flex flex-col gap-8">
+                                        {cities.map(city => (
+                                            <li key={city}>{city}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </LinkHeader>
+                            <LinkHeader title="SELL" onClick={() => handleClick("SELL")}>
+                                <div id="SELL" className={activeItem === "SELL" ? `p-10 absolute top-16 left-0 min-w-52 bg-white shadow-md` : `hidden`}>
+                                    <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">City</h1>
+                                    <ul className="flex flex-col gap-8">
+                                        {cities.map(city => (
+                                            <li key={city}>{city}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </LinkHeader>
+                            <LinkHeader title="ADVERTISE" onClick={() => handleClick("ADVERTISE")}>
+                                <div id="ADVERTISE" className={activeItem == "ADVERTISE" ? `p-4 bg-white shadow-md` : `hidden`}>
+                                    <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">Advertise on OpenHouses</h1>
+                                    <ul className="flex flex-col gap-4">
+                                        <li>Advertise Houses</li>
+                                        <li>Advertise Flats</li>
+                                        <li>Advertise Single Room</li>
+                                        <li>Advertise Shared Room</li>
+                                        <li>Advertise Double Room</li>
+                                    </ul>
+                                </div>
+                            </LinkHeader>
+                            <LinkHeader title="USEFUL LINKS" onClick={() => handleClick("USEFULL")}>
+                                <div id="USEFULL" className={activeItem == "USEFULL" ? `p-4 bg-white shadow-md` : `hidden`}>
+                                    <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">Utilities</h1>
+                                    <ul className="flex flex-col gap-4">
+                                        <li><a href="https://www.rtb.ie" target="_blank">Residential Tenancies Board</a></li>
+                                    </ul>
+                                </div>
+                            </LinkHeader>
+                            <LinkHeader title="HELP" onClick={() => handleClick("HELP")}>
+                                <div id="HELP" className={activeItem == "HELP" ? `p-4 bg-white shadow-md` : `hidden`}>
+                                    <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">Help Center</h1>
+                                    <ul className="flex flex-col gap-4">
+                                        <li>Frequently Asked Questions</li>
+                                        <li>About OpenHouses</li>
+                                    </ul>
+                                </div>
+                            </LinkHeader>
+                            <LinkHeader signin={true} title={userName ? userName : "SIGN IN"} onClick={() => handleClick("SIGNIN")}>
+                                <div id="SIGNIN" className={activeItem == "SIGNIN" ? `p-4 bg-white shadow-md` : `hidden`}>
+                                    {userName ? (
+                                        <>
+                                            <h4 className="text-sm mb-4">Welcome, {userName}</h4>
+                                            <button className="bg-red-600 text-white w-full p-4 mb-4 rounded-md hover:bg-red-800" onClick={handleLogout}>Logout</button>
+                                            <ul className="flex flex-col gap-4">
+                                                <li className="flex flex-row gap-1 items-center space-around"><TiHeartOutline /> <a href="/favorites">Favorites and Lists</a></li>
+                                                <li className="flex flex-row gap-1 items-center space-around"><HiOutlineBellAlert /> Alerts Created</li>
+                                                <li className="flex flex-row gap-1 items-center space-around"><BsHouses /> <a href="/property/myproperties">My Properties</a></li>
+                                                <li className="flex flex-row gap-1 items-center space-around"><RiMessageLine /> <a href="/messages">Messages</a></li>
+                                            </ul>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <h4 className="text-sm mb-4">Log in to see your favorites, visits, proposals and rentals</h4>
+                                            <button className="bg-sky-700 text-white w-full p-4 mb-4 rounded-md hover:bg-sky-900" onClick={handleSignIn}>Sign In / Register</button>
+                                            <ul className="flex flex-col gap-4">
+
+                                            </ul>
+                                        </>
+                                    )}
+                                </div>
+                            </LinkHeader>
+                        </nav>
+                    </div>
+                </div>
+            )}
+
+        </header>
+    );
+}

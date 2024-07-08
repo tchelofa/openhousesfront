@@ -1,46 +1,46 @@
-'use client'
-import { useEffect, useState } from 'react'
-import { instance as axios } from '@/lib/axiosConfig'
-import { useSearchParams } from 'next/navigation'
-import { Env } from '@/lib/Env'
-import Card from '@/app/property/components/card'
+'use client';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { instance as axios } from '@/lib/axiosConfig';
+import { Env } from '@/lib/Env';
+import Card from '@/app/property/components/card';
 
 interface PropertySchema {
-    id: number
-    publicId: string
-    title: string
-    description: string
-    address: string
-    neighborhood: string
-    city: string
-    county: string
-    country: string
-    postcode: string
-    price: string
-    propertyType: string
-    rooms: string
-    capacity: string
-    toilets: string
-    externalArea: string
-    electricityFee: string
-    wifiFee: string
-    rubbishFee: string
-    depositFee: string
-    timeRefundDeposit: string
-    availableAtInit: string
-    availableAtEnd: string
-    active: boolean
-    businessType: 'RENT' | 'SELL'
-    userId: string
-    updatedAt: string
-    createdAt: string
+    id: number;
+    publicId: string;
+    title: string;
+    description: string;
+    address: string;
+    neighborhood: string;
+    city: string;
+    county: string;
+    country: string;
+    postcode: string;
+    price: string;
+    propertyType: string;
+    rooms: string;
+    capacity: string;
+    toilets: string;
+    externalArea: string;
+    electricityFee: string;
+    wifiFee: string;
+    rubbishFee: string;
+    depositFee: string;
+    timeRefundDeposit: string;
+    availableAtInit: string;
+    availableAtEnd: string;
+    active: boolean;
+    businessType: 'RENT' | 'SELL';
+    userId: string;
+    updatedAt: string;
+    createdAt: string;
 }
 
-export default function Filter() {
-    const searchParams = useSearchParams()
-    const searchTerm = searchParams.get('searchTerm')
-    const [properties, setProperties] = useState<PropertySchema[]>([])
-    const [loading, setLoading] = useState<boolean>(true)
+const Filter = () => {
+    const searchParams = useSearchParams();
+    const searchTerm = searchParams.get('searchTerm');
+    const [properties, setProperties] = useState<PropertySchema[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const fetchFilteredProperties = async () => {
@@ -49,23 +49,23 @@ export default function Filter() {
                     const response = await axios.get<{ properties: PropertySchema[] }>(
                         `${Env.baseurl}/properties/filtered`,
                         { params: { searchTerm } }
-                    )
-                    setProperties(response.data.properties)
+                    );
+                    setProperties(response.data.properties);
                 } catch (error) {
-                    console.error('Error fetching filtered properties:', error)
+                    console.error('Error fetching filtered properties:', error);
                 } finally {
-                    setLoading(false)
+                    setLoading(false);
                 }
             } else {
-                setLoading(false)
+                setLoading(false);
             }
-        }
+        };
 
-        fetchFilteredProperties()
-    }, [searchTerm])
+        fetchFilteredProperties();
+    }, [searchTerm]);
 
     if (loading) {
-        return <div>Loading...</div>
+        return <div>Loading...</div>;
     }
 
     return (
@@ -84,5 +84,7 @@ export default function Filter() {
                 )}
             </div>
         </div>
-    )
-}
+    );
+};
+
+export default Filter;

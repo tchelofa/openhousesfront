@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import 'react-toastify/dist/ReactToastify.css';
 import { instance as axios } from '@/lib/axiosConfig';
@@ -96,53 +96,55 @@ const Messages = () => {
 
       {/* Chat Section */}
       <section className="flex flex-col w-full lg:w-2/3 h-[calc(100vh-88.52px)] border p-4">
-        {publicId ? (
-          <>
-            {/* Chat Header */}
-            <div className="border-b pb-4 mb-4">
-              <h1 className="font-bold text-lg">Chat with {publicId}</h1>
-            </div>
+        <Suspense fallback={<div>Loading chat...</div>}>
+          {publicId ? (
+            <>
+              {/* Chat Header */}
+              <div className="border-b pb-4 mb-4">
+                <h1 className="font-bold text-lg">Chat with {publicId}</h1>
+              </div>
 
-            {/* Chat Messages */}
-            <div className="flex-grow overflow-y-auto mb-4">
-              {messages.map(msg => (
-                <div
-                  key={msg.id}
-                  className={`flex flex-col mb-4 ${msg.userFromId === 'currentUserPublicId' ? 'items-end' : 'items-start'}`}
+              {/* Chat Messages */}
+              <div className="flex-grow overflow-y-auto mb-4">
+                {messages.map(msg => (
+                  <div
+                    key={msg.id}
+                    className={`flex flex-col mb-4 ${msg.userFromId === 'currentUserPublicId' ? 'items-end' : 'items-start'}`}
+                  >
+                    <div className={`p-4 rounded-lg max-w-xs ${msg.userFromId === 'currentUserPublicId' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>
+                      {msg.message}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {getMessageStatusText(msg.status)}
+                    </div>
+                  </div>
+                ))}
+                <div ref={messageEndRef} />
+              </div>
+
+              {/* Chat Input */}
+              <div className="border-t pt-4 flex items-center">
+                <input
+                  type="text"
+                  className="border border-gray-300 p-2 w-full rounded-lg outline-none"
+                  placeholder="Type a message..."
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                />
+                <button
+                  className="bg-blue-600 text-white p-2 rounded-lg ml-4"
+                  onClick={handleSendMessage}
                 >
-                  <div className={`p-4 rounded-lg max-w-xs ${msg.userFromId === 'currentUserPublicId' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>
-                    {msg.message}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    {getMessageStatusText(msg.status)}
-                  </div>
-                </div>
-              ))}
-              <div ref={messageEndRef} />
+                  Send
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              Select a conversation to start chatting
             </div>
-
-            {/* Chat Input */}
-            <div className="border-t pt-4 flex items-center">
-              <input
-                type="text"
-                className="border border-gray-300 p-2 w-full rounded-lg outline-none"
-                placeholder="Type a message..."
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-              />
-              <button
-                className="bg-blue-600 text-white p-2 rounded-lg ml-4"
-                onClick={handleSendMessage}
-              >
-                Send
-              </button>
-            </div>
-          </>
-        ) : (
-          <div className="flex items-center justify-center h-full">
-            Select a conversation to start chatting
-          </div>
-        )}
+          )}
+        </Suspense>
       </section>
     </main>
   );

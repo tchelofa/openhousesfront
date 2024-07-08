@@ -1,12 +1,12 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { Env } from '@/lib/Env';
 import { useRouter } from 'next/navigation';
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // Required for carousel styles
 import { Carousel } from 'react-responsive-carousel';
-import { MdArrowBackIos, MdFavorite, MdFavoriteBorder } from "react-icons/md";
+import { MdArrowBackIos } from "react-icons/md";
 import Favorites from '../components/favorites';
 import SendMessage from '../components/sendMessage';
 
@@ -38,7 +38,7 @@ interface HouseDetails {
     userId: string;
     updatedAt: string;
     createdAt: string;
-    publicId: string
+    publicId: string;
     images: string[]; // Array of image URLs
 }
 
@@ -51,8 +51,8 @@ interface ImageSchema {
     createdAt: string;
 }
 
-const HouseDetails = () => {
-    const router = useRouter()
+const HouseDetailsComponent = () => {
+    const router = useRouter();
     const searchParams = useSearchParams();
     const searchTerm = searchParams.get('id');
 
@@ -72,9 +72,8 @@ const HouseDetails = () => {
         const fetchHouseDetails = async () => {
             try {
                 const response = await axios.get<{ property: HouseDetails }>(`${Env.baseurl}/properties/getDetails/${searchTerm}`);
-                console.log('House details response:', response.data);
-                if(!response.data.property.active){
-                    router.push('/')
+                if (!response.data.property.active) {
+                    router.push('/');
                 }
                 setHouseDetails(response.data.property);
                 setIsLoading(false);
@@ -97,9 +96,10 @@ const HouseDetails = () => {
             }
         };
 
-
-        fetchHouseDetails();
-        fetchImages();
+        if (searchTerm) {
+            fetchHouseDetails();
+            fetchImages();
+        }
     }, [searchTerm, userId]);
 
     const calculateDaysPassed = (createdAt: string) => {
@@ -110,12 +110,10 @@ const HouseDetails = () => {
         return differenceInDays;
     };
 
-
-
     return (
         <div className="w-full flex flex-col p-10 mx-auto gap-10">
             <h1 className="text-md font-bold w-fit hover:bg-gray-100 p-4 rounded-md">
-                <a href="" className='flex items-center gap-4'>
+                <a href="/" className='flex items-center gap-4'>
                     <MdArrowBackIos />{`Back`}
                 </a>
             </h1>
@@ -127,8 +125,7 @@ const HouseDetails = () => {
                     {/* Main content */}
                     <div className="sm:w-2/3 p-4">
                         {images.length > 0 ? (
-                            <div>
-                                <Carousel showThumbs={false} infiniteLoop useKeyboardArrows autoPlay>
+                            <Carousel showThumbs={false} infiniteLoop useKeyboardArrows autoPlay>
                                 {images.map((imageUrl, index) => (
                                     <div key={index}>
                                         <img
@@ -139,20 +136,16 @@ const HouseDetails = () => {
                                     </div>
                                 ))}
                             </Carousel>
-                            
-                            </div>
-                            
                         ) : (
                             <p>No images available</p>
                         )}
                     </div>
-                    
+
                     {/* Sidebar */}
                     <div className="sm:w-1/3 p-4">
                         <div className="">
                             <h2 className="text-3xl font-semibold mb-4">{houseDetails.title}</h2>
-                            <Favorites userId={userId} propertyId={houseDetails.publicId}/>
-                            
+                            <Favorites userId={userId} propertyId={houseDetails.publicId} />
                         </div>
                         <p className="text-lg mb-4">{houseDetails.description}</p>
                         <div className='font-bold text-xl'>Details</div>
@@ -242,4 +235,10 @@ const HouseDetails = () => {
     );
 };
 
-export default HouseDetails;
+const HouseDetailsPage = () => (
+    <Suspense fallback={<div>Loading...</div>}>
+        <HouseDetailsComponent />
+    </Suspense>
+);
+
+export default HouseDetailsPage;

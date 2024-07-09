@@ -4,6 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { Env } from "@/lib/Env";
 import { instance as axios } from "@/lib/axiosConfig";
 import 'react-toastify/dist/ReactToastify.css'; // Importação do toast para exibir mensagens
+import Uploads from "./components/uploads";
 
 export default function Page() {
     const [userid, setUserId] = useState<string>('')
@@ -78,6 +79,7 @@ export default function Page() {
     return (
         <div className="w-full flex flex-col p-10 gap-10">
             <h1 className="text-2xl font-bold">New Property</h1>
+            <Uploads/>
             <form className="flex flex-col gap-4 w-full mx-auto" onSubmit={handleSubmit}>
                 <div className="flex flex-col lg:flex-row gap-4 w-full">
                     <div className="flex flex-col gap-4 w-full lg:w-1/2">
@@ -160,7 +162,7 @@ export default function Page() {
                             disabled
                             value="Ireland"
                         />
-
+                        
                     </div>
 
                     <div className="flex flex-col gap-4 w-full lg:w-1/2">
@@ -335,6 +337,7 @@ export default function Page() {
                     theme="dark"
                 />
             </form>
+            
         </div>
     )
 }

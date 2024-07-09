@@ -77,6 +77,8 @@ export default function EmailSignIn() {
         <>
             <main className="w-full max-w-lg mx-auto mt-10 px-4 flex flex-col items-start gap-4">
                 <img src="/logo.png" alt="Logo" className="w-[200px] mb-10" />
+                <h1 className="text-xl font-bold">Are you new here?</h1>  <a href="/auth/register">Create an account.</a>
+                <div className=" w-full h-4 border-b-2"></div>
                 <h1 className="font-bold text-2xl">Sign in with email.</h1>
                 {isAuthenticated ? (
                     <div className="flex flex-col gap-4">
@@ -96,8 +98,7 @@ export default function EmailSignIn() {
                         </div>
                     </form>
                 )}
-                <div className=" w-full h-4 border-b-2"></div>
-                <h1 className="text-xl font-bold">Are you new here?</h1>  <a href="/auth/register">Create an account.</a>
+                
                 <ToastContainer
                     position="top-right"
                     autoClose={5000}

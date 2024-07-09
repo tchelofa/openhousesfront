@@ -16,7 +16,9 @@ export default function Signin() {
             
             <main className="w-full max-w-md mx-auto mt-10 px-4 flex flex-col items-start gap-4">
                 <img src="/logo.png" alt="Logo" className="w-[200px] mb-10 self-center"/>
-                <h1 className="font-bold text-2xl">Sign in or create your account.</h1>
+                <h1 className="text-xl font-bold">Are you new here?</h1>  <a href="/auth/register">Create an account.</a>
+                <div className=" w-full h-4 border-b-2"></div>
+                <h1 className="font-bold text-2xl">Sign in.</h1>
                 <h4 className="text-sm my-5">OpenDoors, Open Minds. Find Your Irish Home Now.</h4>
                 <button className="w-full bg-red-700 p-4 rounded-md hover:bg-red-900 flex items-center justify-center gap-4 text-white" disabled>
                     <BsGoogle /> Sign In With Google 
@@ -30,10 +32,9 @@ export default function Signin() {
                 >
                     <MdEmail /> Sign In With Email
                 </button>
-                <div className=" w-full h-4 border-b-2"></div>
-                <h1 className="text-xl font-bold">Are you new here?</h1>  <a href="/auth/register">Create an account.</a>
+                
                 <footer className="w-full text-center mt-4">
-                    By continuing, you agree to the <a href="/terms-use" className="border-b-2">Terms of Use</a> and are aware of the <a href="/private-police" className="border-b-2">Privacy Policy</a>.
+                    By continuing, you agree to the <a href="/use-terms" className="border-b-2">Terms of Use</a> and are aware of the <a href="/use-terms" className="border-b-2">Privacy Policy</a>.
                 </footer>
             </main>
         </div>

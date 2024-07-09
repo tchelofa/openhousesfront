@@ -150,28 +150,28 @@ export default function Header() {
             <nav className="hidden md:flex items-center gap-4" ref={menuRef}>
                 {/* Links for larger screens */}
                 <LinkHeader title="RENT" onClick={() => handleClick("RENT")}>
-                    <div id="RENT" className={activeItem === "RENT" ? `p-10 absolute top-16 left-0 min-w-52 bg-white shadow-md` : `hidden`}>
+                    <div id="RENT" className={activeItem === "RENT" ?  `p-10 absolute top-16 left-0 w-[400px] bg-white shadow-md z-40` : `hidden`}>
                         <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">City</h1>
                         <ul className="flex flex-col gap-8">
                             {cities.map(city => (
-                                <li key={city}>{city}</li>
+                                <li key={city}><a href={`/property/filter/?searchTerm=${city}&businessType=RENT`}>{city}</a></li>
                             ))}
                         </ul>
                     </div>
                 </LinkHeader>
                 <LinkHeader title="SELL" onClick={() => handleClick("SELL")}>
-                    <div id="SELL" className={activeItem === "SELL" ? `p-10 absolute top-16 left-0 min-w-52 bg-white shadow-md` : `hidden`}>
+                    <div id="SELL" className={activeItem === "SELL" ?  `p-10 absolute top-16 left-0 w-[400px] bg-white shadow-md z-40` : `hidden`}>
                         <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">City</h1>
                         <ul className="flex flex-col gap-8">
                             {cities.map(city => (
-                                <li key={city}>{city}</li>
+                                <li key={city}><a href={`/property/filter/?searchTerm=${city}&businessType=SELL`}>{city}</a></li>
                             ))}
                         </ul>
                     </div>
                 </LinkHeader>
 
                 <LinkHeader title="ADVERTISE" onClick={() => handleClick("ADVERTISE")}>
-                    <div id="ADVERTISE" className={activeItem == "ADVERTISE" ? `p-10 absolute top-16 left-0 w-[400px] bg-white shadow-md` : `hidden`}>
+                    <div id="ADVERTISE" className={activeItem == "ADVERTISE" ? `p-10 absolute top-16 left-0 w-[400px] bg-white shadow-md z-40` : `hidden`}>
                         <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">Advertise on OpenHouses</h1>
                         <ul className="flex flex-col gap-8">
                             <li><a href="/auth/register/advertisor">Advertise Houses</a></li>
@@ -183,7 +183,7 @@ export default function Header() {
                     </div>
                 </LinkHeader>
                 <LinkHeader title="USEFULL LINKS" onClick={() => handleClick("USEFULL")}>
-                    <div id="USEFULL" className={activeItem == "USEFULL" ? `p-10 absolute top-16 left-0 min-w-52 bg-white shadow-md` : `hidden`}>
+                    <div id="USEFULL" className={activeItem == "USEFULL" ? `p-10 absolute top-16 left-0 min-w-52 bg-white shadow-md z-40` : `hidden`}>
                         <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">Utilities</h1>
                         <ul className="flex flex-col gap-8">
                             <li><a href="https://www.rtb.ie" target="_blank">Residential Tenancies Board</a></li>
@@ -191,7 +191,7 @@ export default function Header() {
                     </div>
                 </LinkHeader>
                 <LinkHeader title="HELP" onClick={() => handleClick("HELP")}>
-                    <div id="HELP" className={activeItem == "HELP" ? `p-10 absolute top-16 left-0 min-w-64 bg-white shadow-md` : `hidden`}>
+                    <div id="HELP" className={activeItem == "HELP" ? `p-10 absolute top-16 left-0 min-w-64 bg-white shadow-md z-40` : `hidden`}>
                         <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">Ask your questions</h1>
                         <ul className="flex flex-col gap-8">
                             <li><a href="/use-terms">Use Terms</a></li>
@@ -225,31 +225,31 @@ export default function Header() {
                 </LinkHeader>
             </nav>
             {sidebarOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden" onClick={() => setSidebarOpen(false)}>
-                    <div className="fixed inset-y-0 left-0 w-2/3 bg-white shadow-md p-4" ref={menuRef} onClick={(e) => e.stopPropagation()}>
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden overflow-auto" onClick={() => setSidebarOpen(false)}>
+                    <div className="fixed inset-y-0 left-0 w-2/3 bg-white shadow-md p-4 overflow-y-auto" ref={menuRef} onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-between mb-4">
                             <img src="/logo.png" alt="Logo" className="w-48" />
                             <button onClick={() => setSidebarOpen(false)}>
                                 <FaTimes className="w-6 h-6" />
                             </button>
                         </div>
-                        <nav className="flex flex-col gap-4">
+                        <nav className="flex flex-col gap-4  overflow-y-auto">
                             <LinkHeader title="RENT" onClick={() => handleClick("RENT")}>
-                                <div id="RENT" className={activeItem === "RENT" ? `p-10 absolute top-16 left-0 min-w-52 bg-white shadow-md` : `hidden`}>
+                                <div id="RENT" className={activeItem === "RENT" ?   `p-4 bg-white shadow-md` : `hidden`}>
                                     <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">City</h1>
                                     <ul className="flex flex-col gap-8">
                                         {cities.map(city => (
-                                            <li key={city}>{city}</li>
+                                            <li key={city}><a href={`/property/filter/?searchTerm=${city}&businessType=RENT`}>{city}</a></li>
                                         ))}
                                     </ul>
                                 </div>
                             </LinkHeader>
                             <LinkHeader title="SELL" onClick={() => handleClick("SELL")}>
-                                <div id="SELL" className={activeItem === "SELL" ? `p-10 absolute top-16 left-0 min-w-52 bg-white shadow-md` : `hidden`}>
+                                <div id="SELL" className={activeItem === "SELL" ?  `p-4 bg-white shadow-md` : `hidden`}>
                                     <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">City</h1>
                                     <ul className="flex flex-col gap-8">
                                         {cities.map(city => (
-                                            <li key={city}>{city}</li>
+                                            <li key={city}><a href={`/property/filter/?searchTerm=${city}&businessType=SELL`}>{city}</a></li>
                                         ))}
                                     </ul>
                                 </div>

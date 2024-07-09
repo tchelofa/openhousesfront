@@ -112,12 +112,12 @@ export default function MainPage() {
                         <ul className='flex flex-col gap-4'>
                             {searchResults.map(property => (
                                 <li key={property.id}>
-                                    <a href={`/property/filter/?searchTerm=${searchTerm}`} className='flex gap-4'><h1 className='font-bold'>{property.city}</h1></a>
+                                    <a href={`/property/filter/?searchTerm=${searchTerm}&businessType=${activeOption}`} className='flex gap-4'><h1 className='font-bold'>{property.city}</h1></a>
                                 </li>
                             ))}
                         </ul>
                     ) : (
-                        <p></p>
+                        <p>{debouncedSearchTerm.length >= 3 ? "We cannot find any property as you have been informed." : ""}</p>
                     )}
                 </div>
             </section>

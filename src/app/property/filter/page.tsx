@@ -39,6 +39,7 @@ interface PropertySchema {
 function PropertyFilterPage() {
     const searchParams = useSearchParams();
     const searchTerm = searchParams.get('searchTerm');
+    const businessType = searchParams.get('businessType');
     const [properties, setProperties] = useState<PropertySchema[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
@@ -48,7 +49,7 @@ function PropertyFilterPage() {
                 try {
                     const response = await axios.get<{ properties: PropertySchema[] }>(
                         `${Env.baseurl}/properties/filtered`,
-                        { params: { searchTerm } }
+                        { params: { searchTerm, businessType } }
                     );
                     setProperties(response.data.properties);
                 } catch (error) {

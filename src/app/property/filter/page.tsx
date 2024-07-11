@@ -36,6 +36,12 @@ interface PropertySchema {
     createdAt: string;
 }
 
+type ApiResponse = {
+    status: string;
+    message: string;
+    data: PropertySchema[];
+};
+
 function PropertyFilterPage() {
     const searchParams = useSearchParams();
     const searchTerm = searchParams.get('searchTerm') || '';
@@ -47,18 +53,25 @@ function PropertyFilterPage() {
         const fetchFilteredProperties = async () => {
             if (searchTerm.length >= 3) {
                 try {
-                    const response = await axios.get<{ properties: PropertySchema[] }>(
+                    const response = await axios.get<ApiResponse>(
                         `${Env.baseurl}/properties/filtered`,
                         { params: { searchTerm, businessType } }
                     );
-                    setProperties(response.data.properties);
+
+                    if (response.data && Array.isArray(response.data.data)) {
+                        setProperties(response.data.data);
+                    } else {
+                        setProperties([]);
+                    }
                 } catch (error) {
                     console.error('Error fetching filtered properties:', error);
+                    setProperties([]);
                 } finally {
                     setLoading(false);
                 }
             } else {
                 setLoading(false);
+                setProperties([]);
             }
         };
 

@@ -1,21 +1,23 @@
 'use client'
-import { useEffect, useState } from "react"
+import { useEffect, useState, FormEvent } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import { Env } from "@/lib/Env";
 import { instance as axios } from "@/lib/axiosConfig";
-import 'react-toastify/dist/ReactToastify.css'; // Importação do toast para exibir mensagens
-import Uploads from "./components/uploads";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Page() {
-    const [userid, setUserId] = useState<string>('')
-    const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [userid, setUserId] = useState<string>('');
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [propertyId, setPropertyId] = useState<string | null>(null);
+    const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
-        const id = localStorage.getItem("id")
+        const id = localStorage.getItem("id");
         if (id) {
-            setUserId(id)
+            setUserId(id);
         }
-    }, [])
+    }, []);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -24,10 +26,8 @@ export default function Page() {
         const formData = new FormData(event.currentTarget);
         const data = Object.fromEntries(formData.entries());
 
-        // Convert externalArea to a boolean value
         data.externalArea = formData.get('externalArea') === 'on' ? 'true' : 'false';
 
-        // Validação dos campos obrigatórios
         const requiredFields = [
             'title', 'description', 'address', 'neighborhood', 'city', 'county', 
             'price', 'propertyType', 'rooms', 'capacity', 'toilets'
@@ -41,23 +41,76 @@ export default function Page() {
         }
 
         try {
-            const response = await axios.post(`${Env.baseurl}/properties/new`, data, {
+            await axios.post(`${Env.baseurl}/properties/new`, data, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-            });
+            })
+            .then(response => {
+                if (response.data !== false) {
+                    toast.success('Property registered successfully');
+                    setPropertyId(response.data.publicId); // Assume-se que o publicId é retornado na resposta
+                    console.log(response.data.publicId)
+                    console.error(response.data.publicId)
+                } else {
+                    toast.error('Failed to register property');
+                }
+            })
 
             setIsLoading(false);
 
-            if (response.status === 201) {
-                toast.success('Property registered successfully');
-            } else {
-                toast.error('Failed to register property');
-            }
+           
         } catch (error) {
             setIsLoading(false);
             console.error('Error registering property:', error);
             toast.error('Failed to register property');
+        }
+    };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files) {
+            setSelectedFiles(event.target.files);
+            setErrorMessage(null);
+        }
+    };
+
+    const handleFileUpload = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        if (selectedFiles && propertyId) {
+            let anyFileTooLarge = false;
+            const maxFileSize = 3 * 1024 * 1024;
+
+            const formData = new FormData();
+            formData.append('publicId', propertyId);
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const file = selectedFiles[i];
+                if (file.size > maxFileSize) {
+                    anyFileTooLarge = true;
+                    const fileSizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+                    setErrorMessage(`File "${file.name}" (${fileSizeInMB}MB) exceeds the maximum allowable size of 3MB.`);
+                    break;
+                }
+                formData.append('files', file);
+            }
+
+            if (anyFileTooLarge) {
+                return;
+            }
+
+            try {
+                const response = await axios.post(`${Env.baseurl}/uploads/multiplefiles/`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+
+                console.log('Upload successful:', response.data);
+            } catch (error) {
+                console.error('Error uploading files:', error);
+            }
+        } else {
+            console.error('No files selected or property ID missing.');
         }
     };
 
@@ -79,7 +132,6 @@ export default function Page() {
     return (
         <div className="w-full flex flex-col p-10 gap-10">
             <h1 className="text-2xl font-bold">New Property</h1>
-            <Uploads/>
             <form className="flex flex-col gap-4 w-full mx-auto" onSubmit={handleSubmit}>
                 <div className="flex flex-col lg:flex-row gap-4 w-full">
                     <div className="flex flex-col gap-4 w-full lg:w-1/2">
@@ -162,6 +214,11 @@ export default function Page() {
                             disabled
                             value="Ireland"
                         />
+                        <label htmlFor="businessType">Business Type</label>
+                        <select name="businessType" id="businessType" className="border border-gray-300 p-4 w-full outline-none focus:shadow-md">
+                            <option value="RENT">Rent</option>
+                            <option value="SELL">Sell</option>
+                        </select>
                         
                     </div>
 
@@ -337,7 +394,21 @@ export default function Page() {
                     theme="dark"
                 />
             </form>
-            
+
+            {propertyId && (
+                <form onSubmit={handleFileUpload} className="flex flex-col gap-4">
+                    <input type="hidden" name="publicId" value={propertyId} />
+                    <input
+                        type="file"
+                        name="files"
+                        onChange={handleFileChange}
+                        multiple
+                        accept="image/jpeg, image/png"
+                    />
+                    <button type="submit">Upload</button>
+                </form>
+            )}
+            {errorMessage && <p className="text-red-500">{errorMessage}</p>}
         </div>
-    )
+    );
 }

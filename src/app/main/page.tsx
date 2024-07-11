@@ -33,6 +33,13 @@ interface PropertySchema {
     createdAt: string;
 }
 
+type ApiResponse = {
+    status: 'success' | 'error';
+    message: string;
+    data?: PropertySchema[];
+    error?: string;
+}
+
 export default function MainPage() {
     const [activeOption, setActiveOption] = useState<'RENT' | 'SELL'>('RENT');
     const [searchTerm, setSearchTerm] = useState('');
@@ -57,16 +64,22 @@ export default function MainPage() {
 
     const fetchProperties = async (term: string) => {
         try {
-            const response = await axios.get<{ properties: PropertySchema[] }>(`${Env.baseurl}/properties/filtered`, {
+            const response = await axios.get<ApiResponse>(`${Env.baseurl}/properties/filtered`, {
                 params: {
                     searchTerm: term,
                     businessType: activeOption
                 }
             });
 
-            setSearchResults(response.data.properties);
+            if (response.data && response.data.status === 'success' && Array.isArray(response.data.data)) {
+                setSearchResults(response.data.data);
+            } else {
+                setSearchResults([]);
+                console.error('Error in response data:', response.data);
+            }
         } catch (error) {
             console.error('Error fetching properties:', error);
+            setSearchResults([]);
         }
     };
 

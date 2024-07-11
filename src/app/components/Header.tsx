@@ -40,11 +40,18 @@ interface PropertySchema {
     createdAt: string;
 }
 
+type ApiResponse<T> = {
+    status: 'success' | 'error';
+    message: string;
+    data?: T;
+    error?: string;
+};
+
 export default function Header() {
     const router = useRouter();
     const [activeItem, setActiveItem] = useState("");
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [userName, setUserName] = useState(null); // Estado para armazenar o nome do usuário
+    const [userName, setUserName] = useState<string | null>(null); // Estado para armazenar o nome do usuário
     const [cities, setCities] = useState<string[]>([]); // Estado para armazenar as cidades disponíveis
 
     const menuRef = useRef<HTMLDivElement>(null);
@@ -116,12 +123,11 @@ export default function Header() {
     }, []);
 
 
-
     const fetchCities = async () => {
         try {
-            const propertiesResponse = await axios.get<{ properties: PropertySchema[] }>(`${Env.baseurl}/properties`);
-            const properties = propertiesResponse.data.properties;
-    
+            const propertiesResponse = await axios.get<ApiResponse<PropertySchema[]>>(`${Env.baseurl}/properties`);
+            const properties = propertiesResponse.data.data;
+            
             if (Array.isArray(properties)) {
                 const uniqueCities = Array.from(new Set(properties.map(property => property.city)));
                 setCities(uniqueCities);
@@ -131,7 +137,7 @@ export default function Header() {
         } catch (error) {
             console.error('Error fetching properties:', error);
         }
-    }
+    };
     
     useEffect(() => {    
         fetchCities();

@@ -5,18 +5,52 @@ import { Env } from "@/lib/Env";
 import { instance as axios } from "@/lib/axiosConfig";
 import 'react-toastify/dist/ReactToastify.css';
 
+type ApiResponse<T> = {
+    status: 'success' | 'error';
+    message: string;
+    data?: T;
+    error?: string;
+};
+
+type Property = {
+    publicId: string;
+    title: string;
+    description: string;
+    address: string;
+    // Adicione outros campos conforme necessário
+};
+
 export default function Page() {
     const [userid, setUserId] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [propertyId, setPropertyId] = useState<string | null>(null);
     const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [properties, setProperties] = useState<Property[]>([]);
 
     useEffect(() => {
         const id = localStorage.getItem("id");
         if (id) {
             setUserId(id);
         }
+    }, []);
+
+    useEffect(() => {
+        const fetchProperties = async () => {
+            try {
+                const response = await axios.get<ApiResponse<Property[]>>(`${Env.baseurl}/properties`);
+                if (response.data.status === 'success') {
+                    setProperties(response.data.data || []);
+                } else {
+                    toast.error(response.data.message);
+                }
+            } catch (error: any) {
+                console.error('Error fetching properties:', error);
+                toast.error(error.response?.data?.message || 'Failed to fetch properties');
+            }
+        };
+
+        fetchProperties();
     }, []);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -41,29 +75,24 @@ export default function Page() {
         }
 
         try {
-            await axios.post(`${Env.baseurl}/properties/new`, data, {
+            const response = await axios.post<ApiResponse<Property>>(`${Env.baseurl}/properties/new`, data, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-            })
-            .then(response => {
-                if (response.data !== false) {
-                    toast.success('Property registered successfully');
-                    setPropertyId(response.data.publicId); // Assume-se que o publicId é retornado na resposta
-                    console.log(response.data.publicId)
-                    console.error(response.data.publicId)
-                } else {
-                    toast.error('Failed to register property');
-                }
-            })
+            });
 
             setIsLoading(false);
 
-           
-        } catch (error) {
+            if (response.data.status === 'success') {
+                toast.success(response.data.message);
+                setPropertyId(response.data.data!.publicId);
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error: any) {
             setIsLoading(false);
             console.error('Error registering property:', error);
-            toast.error('Failed to register property');
+            toast.error(error.response?.data?.message || 'Failed to register property');
         }
     };
 
@@ -99,15 +128,22 @@ export default function Page() {
             }
 
             try {
-                const response = await axios.post(`${Env.baseurl}/uploads/multiplefiles/`, formData, {
+                const response = await axios.post<ApiResponse<any>>(`${Env.baseurl}/uploads/multiplefiles/${propertyId}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
 
+                if (response.data.status === 'success') {
+                    toast.success(response.data.message);
+                } else {
+                    toast.error(response.data.message);
+                }
+
                 console.log('Upload successful:', response.data);
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Error uploading files:', error);
+                toast.error(error.response?.data?.message || 'Failed to upload files');
             }
         } else {
             console.error('No files selected or property ID missing.');
@@ -128,6 +164,17 @@ export default function Page() {
         "Mayo", "Meath", "Monaghan", "Offaly", "Roscommon", "Sligo", "Tipperary",
         "Waterford", "Westmeath", "Wexford", "Wicklow"
     ];
+
+    const removeFile = (index: number) => {
+        if (selectedFiles) {
+            const filesArray = Array.from(selectedFiles);
+            filesArray.splice(index, 1);
+            const newFileList = new DataTransfer();
+            filesArray.forEach(file => newFileList.items.add(file));
+            setSelectedFiles(newFileList.files);
+        }
+    };
+
 
     return (
         <div className="w-full flex flex-col p-10 gap-10">
@@ -396,17 +443,65 @@ export default function Page() {
             </form>
 
             {propertyId && (
-                <form onSubmit={handleFileUpload} className="flex flex-col gap-4">
-                    <input type="hidden" name="publicId" value={propertyId} />
-                    <input
-                        type="file"
-                        name="files"
-                        onChange={handleFileChange}
-                        multiple
-                        accept="image/jpeg, image/png"
-                    />
-                    <button type="submit">Upload</button>
-                </form>
+                <form onSubmit={handleFileUpload} className="flex flex-col items-center p-4 border-2 border-dashed border-blue-400 rounded-lg bg-white shadow-lg">
+                <input type="hidden" name="publicId" value="propertyId" />
+                <div className="flex flex-col items-center justify-center w-full h-48 cursor-pointer" onClick={() => document.getElementById('fileInput')?.click()}>
+                    <svg className="w-12 h-12 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M16.88 3.549a.999.999 0 00-1.39-.282L10 7.588 4.51 3.267A1 1 0 003.118 4.51l5 4.318V15a1 1 0 102 0v-6.172l4.882-4.048a.998.998 0 00.278-1.39z"></path>
+                    </svg>
+                    <p className="mt-2 text-sm text-gray-500">Browse Files to upload</p>
+                </div>
+                <input
+                    id="fileInput"
+                    type="file"
+                    name="files"
+                    onChange={handleFileChange}
+                    multiple
+                    accept="image/jpeg, image/png"
+                    className="hidden"
+                />
+                <div className="w-full mt-4 p-2 bg-blue-50 rounded-lg flex items-center justify-between">
+                    <div className="flex items-center">
+                        <svg className="w-6 h-6 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M8 12a4 4 0 100-8 4 4 0 000 8zm-2 2a6 6 0 0112 0v1H6v-1zm9 1h3v2H2v-2h3v-1a6 6 0 0112 0v1z"></path>
+                        </svg>
+                        <span className="text-sm text-gray-500">
+                            {selectedFiles ? `${selectedFiles.length} file(s) selected` : "No selected File"}
+                        </span>
+                    </div>
+                    {selectedFiles && (
+                        <button type="button" className="text-gray-400 hover:text-gray-600" onClick={() => setSelectedFiles(null)}>
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M6 2a1 1 0 011-1h6a1 1 0 011 1v1h1a2 2 0 012 2v1H4V4a2 2 0 012-2h1V2zm2 5a1 1 0 012 0v8a1 1 0 11-2 0V7zm4 0a1 1 0 112 0v8a1 1 0 11-2 0V7z" clipRule="evenodd"></path>
+                            </svg>
+                        </button>
+                    )}
+                </div>
+                <button type="submit" className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">Upload</button>
+            </form>
+            
+            )}
+            {selectedFiles && (
+                <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {Array.from(selectedFiles).map((file, index) => (
+                        <div key={index} className="relative">
+                            <img
+                                src={URL.createObjectURL(file)}
+                                alt={file.name}
+                                className="w-full h-32 object-cover rounded-md shadow-md"
+                            />
+                            <button
+                                type="button"
+                                className="absolute top-1 right-1 text-red-500 bg-white rounded-full p-1 hover:text-red-700"
+                                onClick={() => removeFile(index)}
+                            >
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M6 2a1 1 0 011-1h6a1 1 0 011 1v1h1a2 2 0 012 2v1H4V4a2 2 0 012-2h1V2zm2 5a1 1 0 012 0v8a1 1 0 11-2 0V7zm4 0a1 1 0 112 0v8a1 1 0 11-2 0V7z" clipRule="evenodd"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    ))}
+                </div>
             )}
             {errorMessage && <p className="text-red-500">{errorMessage}</p>}
         </div>

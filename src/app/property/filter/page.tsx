@@ -38,14 +38,14 @@ interface PropertySchema {
 
 function PropertyFilterPage() {
     const searchParams = useSearchParams();
-    const searchTerm = searchParams.get('searchTerm');
-    const businessType = searchParams.get('businessType');
+    const searchTerm = searchParams.get('searchTerm') || '';
+    const businessType = searchParams.get('businessType') || '';
     const [properties, setProperties] = useState<PropertySchema[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const fetchFilteredProperties = async () => {
-            if (searchTerm && searchTerm.length >= 3) {
+            if (searchTerm.length >= 3) {
                 try {
                     const response = await axios.get<{ properties: PropertySchema[] }>(
                         `${Env.baseurl}/properties/filtered`,
@@ -63,7 +63,7 @@ function PropertyFilterPage() {
         };
 
         fetchFilteredProperties();
-    }, [searchTerm]);
+    }, [searchTerm, businessType]);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -86,8 +86,8 @@ function PropertyFilterPage() {
             </div>
         </div>
     );
-    
-};
+}
+
 export default function PropertyFilter() {
     return (
         <Suspense fallback={<div>Loading...</div>}>

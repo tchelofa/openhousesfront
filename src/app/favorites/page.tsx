@@ -6,8 +6,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from 'react-modal';
 
-
-
 interface FavoriteProperty {
     id: number;
     publicId: string;
@@ -54,17 +52,17 @@ export default function Favorites() {
         const fetchFavorites = async () => {
             try {
                 if (userId) {
-                    const response = await axios.get<{ favorites: FavoriteProperty[] }>(`${Env.baseurl}/properties/favorites/${userId}`);
+                    const response = await axios.get<{ status: string, message: string, data: FavoriteProperty[] }>(`${Env.baseurl}/properties/favorites/${userId}`);
                     console.log('Response:', response.data);
 
-                    if (response.data && response.data.favorites) {
-                        setFavorites(response.data.favorites);
+                    if (response.data && response.data.data) {
+                        setFavorites(response.data.data);
 
-                        console.log('Favorites:', response.data.favorites);
+                        console.log('Favorites:', response.data.data);
 
-                        const promises = response.data.favorites.map(async (favorite: FavoriteProperty) => {
-                            const propertyResponse = await axios.get<{ property: PropertyDetails }>(`${Env.baseurl}/properties/getDetails/${favorite.propertyId}`);
-                            return propertyResponse.data.property;
+                        const promises = response.data.data.map(async (favorite: FavoriteProperty) => {
+                            const propertyResponse = await axios.get<{ status: string, message: string, data: PropertyDetails }>(`${Env.baseurl}/properties/getDetails/${favorite.propertyId}`);
+                            return propertyResponse.data.data;
                         });
 
                         const propertyDetails = await Promise.all(promises);
@@ -113,41 +111,35 @@ export default function Favorites() {
         }
     };
 
-    const renderPagination = () => {
-        // Implementar a lógica para renderizar a paginação, se necessário
-    };
-
     return (
-        <div className="w-full flex flex-col p-10 gap-10">
+        <div className="w-full flex flex-col p-4 gap-4">
             <h1 className="text-2xl font-bold">Favorite Properties</h1>
 
             {isLoading ? (
                 <p className="text-lg">Loading...</p>
             ) : (
-                <div className="table-container">
-                    <table className="table">
+                <div className="table-container overflow-x-auto">
+                    <table className="table-auto w-full text-left">
                         <thead>
                             <tr>
-                                <th>Title</th>
-                                <th>Description</th>
-                                <th>Address</th>
-                                <th>Type</th>
-                                <th>Created At</th>
-                                <th>Action</th>
+                                <th className="px-4 py-2">Title</th>
+                                <th className="px-4 py-2 hidden md:table-cell">Description</th>
+                                <th className="px-4 py-2 hidden lg:table-cell">Address</th>
+                                <th className="px-4 py-2">Type</th>
+                                <th className="px-4 py-2">Created At</th>
+                                <th className="px-4 py-2">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {properties.map((property) => (
                                 <tr key={property.id}>
-                                    <td><a href={`/property/detail/?id=${property.publicId}`}>{property.title}</a></td>
-                                    <td>{property.description}</td>
-                                    <td>{property.address}, {property.neighborhood}, {property.city}, {property.county}, {property.country}</td>
-                                    <td>{property.propertyType}</td>
-                                    <td>{property.createdAt}</td>
-                                    <td>
-                                        <div className="flex gap-4">
-                                            <button className="bg-red-900 text-white p-2 rounded-md" onClick={() => openModal(property)}>Remove</button>
-                                        </div>
+                                    <td className="px-4 py-2"><a href={`/property/details/?id=${property.publicId}`} className="text-blue-600 hover:underline">{property.title}</a></td>
+                                    <td className="px-4 py-2 hidden md:table-cell">{property.description}</td>
+                                    <td className="px-4 py-2 hidden lg:table-cell">{property.address}, {property.neighborhood}, {property.city}, {property.county}, {property.country}</td>
+                                    <td className="px-4 py-2">{property.propertyType}</td>
+                                    <td className="px-4 py-2">{new Date(property.createdAt).toLocaleDateString()}</td>
+                                    <td className="px-4 py-2">
+                                        <button className="bg-red-900 text-white p-2 rounded-md" onClick={() => openModal(property)}>Remove</button>
                                     </td>
                                 </tr>
                             ))}
@@ -160,6 +152,7 @@ export default function Favorites() {
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
                 contentLabel="Confirm Remove Property"
+                ariaHideApp={false} // Use this line to temporarily disable the warning (not recommended for production)
                 style={{
                     overlay: {
                         backgroundColor: 'rgba(0, 0, 0, 0.7)', // Set background color and opacity
@@ -169,7 +162,7 @@ export default function Favorites() {
                     },
                     content: {
                         maxWidth: '300px', // Set maximum width for modal content
-                        maxHeight:'200px',
+                        maxHeight: '200px',
                         margin: '0 auto', // Center the modal content horizontally
                         padding: '20px', // Add padding for better spacing
                         border: 'none', // Remove default border

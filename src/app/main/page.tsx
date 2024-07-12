@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Env } from '@/lib/Env'; // Certifique-se de que o caminho está correto para sua configuração de ambiente
@@ -91,6 +91,8 @@ export default function MainPage() {
         setSearchTerm(event.target.value);
     };
 
+    const uniqueCities = Array.from(new Set(searchResults.map(property => property.city)));
+
     return (
         <main className="p-4 w-full min-h-screen" style={{ backgroundImage: 'url("/bg.jpg")', backgroundSize: 'cover', backgroundPosition: 'top' }}>
             <section className="bg-white p-10 rounded-lg shadow-md w-full md:w-2/3 lg:w-1/2 xl:w-1/3 flex flex-col gap-4 mx-auto">
@@ -121,11 +123,13 @@ export default function MainPage() {
                     />
                 </form>
                 <div>
-                    {searchResults.length > 0 ? (
+                    {uniqueCities.length > 0 ? (
                         <ul className='flex flex-col gap-4'>
-                            {searchResults.map(property => (
-                                <li key={property.id}>
-                                    <a href={`/property/filter/?searchTerm=${searchTerm}&businessType=${activeOption}`} className='flex gap-4'><h1 className='font-bold'>{property.city}</h1></a>
+                            {uniqueCities.map((city, index) => (
+                                <li key={index}>
+                                    <a href={`/property/filter/?searchTerm=${city}&businessType=${activeOption}`} className='flex gap-4'>
+                                        <h1 className='font-bold'>{city}</h1>
+                                    </a>
                                 </li>
                             ))}
                         </ul>

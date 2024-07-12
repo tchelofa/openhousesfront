@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { FaBars, FaTimes } from "react-icons/fa";
@@ -26,7 +26,7 @@ interface PropertySchema {
     rooms: string;
     capacity: string;
     toilets: string;
-    externalArea: string; // Considerar mudar para boolean
+    externalArea: string;
     electricityFee: string;
     wifiFee: string;
     rubbishFee: string;
@@ -51,16 +51,17 @@ export default function Header() {
     const router = useRouter();
     const [activeItem, setActiveItem] = useState("");
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [userName, setUserName] = useState<string | null>(null); // Estado para armazenar o nome do usuário
-    const [cities, setCities] = useState<string[]>([]); // Estado para armazenar as cidades disponíveis
+    const [userName, setUserName] = useState<string | null>(null);
+    const [rentCities, setRentCities] = useState<string[]>([]);
+    const [sellCities, setSellCities] = useState<string[]>([]);
 
     const menuRef = useRef<HTMLDivElement>(null);
 
     const handleClick = (id: string) => {
         if (activeItem === id) {
-            setActiveItem(""); // Fecha a div se clicar no mesmo link novamente
+            setActiveItem("");
         } else {
-            setActiveItem(id); // Abre a div correspondente ao link clicado
+            setActiveItem(id);
         }
     };
 
@@ -122,17 +123,25 @@ export default function Header() {
 
     }, []);
 
-
-    const fetchCities = async () => {
+    const fetchCities = async (businessType: 'RENT' | 'SELL') => {
         try {
-            const propertiesResponse = await axios.get<ApiResponse<PropertySchema[]>>(`${Env.baseurl}/properties`);
-            const properties = propertiesResponse.data.data;
+            const response = await axios.get<ApiResponse<PropertySchema[]>>(`${Env.baseurl}/properties/filtered`, {
+                params: {
+                    searchTerm: '',  // This can be adjusted if you need a specific search term
+                    businessType
+                }
+            });
+            const properties = response.data.data;
             
             if (Array.isArray(properties)) {
                 const uniqueCities = Array.from(new Set(properties.map(property => property.city)));
-                setCities(uniqueCities);
+                if (businessType === 'RENT') {
+                    setRentCities(uniqueCities);
+                } else if (businessType === 'SELL') {
+                    setSellCities(uniqueCities);
+                }
             } else {
-                console.error('Response data is not an array:', propertiesResponse.data);
+                console.error('Response data is not an array:', response.data);
             }
         } catch (error) {
             console.error('Error fetching properties:', error);
@@ -140,7 +149,8 @@ export default function Header() {
     };
     
     useEffect(() => {    
-        fetchCities();
+        fetchCities('RENT');
+        fetchCities('SELL');
     }, []);
 
     return (
@@ -154,12 +164,11 @@ export default function Header() {
                 </button>
             </div>
             <nav className="hidden md:flex items-center gap-4" ref={menuRef}>
-                {/* Links for larger screens */}
                 <LinkHeader title="RENT" onClick={() => handleClick("RENT")}>
                     <div id="RENT" className={activeItem === "RENT" ?  `p-10 absolute top-16 left-0 w-[400px] bg-white shadow-md z-40` : `hidden`}>
                         <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">City</h1>
                         <ul className="flex flex-col gap-8">
-                            {cities.map(city => (
+                            {rentCities.map(city => (
                                 <li key={city}><a href={`/property/filter/?searchTerm=${city}&businessType=RENT`}>{city}</a></li>
                             ))}
                         </ul>
@@ -169,7 +178,7 @@ export default function Header() {
                     <div id="SELL" className={activeItem === "SELL" ?  `p-10 absolute top-16 left-0 w-[400px] bg-white shadow-md z-40` : `hidden`}>
                         <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">City</h1>
                         <ul className="flex flex-col gap-8">
-                            {cities.map(city => (
+                            {sellCities.map(city => (
                                 <li key={city}><a href={`/property/filter/?searchTerm=${city}&businessType=SELL`}>{city}</a></li>
                             ))}
                         </ul>
@@ -244,7 +253,7 @@ export default function Header() {
                                 <div id="RENT" className={activeItem === "RENT" ?   `p-4 bg-white shadow-md` : `hidden`}>
                                     <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">City</h1>
                                     <ul className="flex flex-col gap-8">
-                                        {cities.map(city => (
+                                        {rentCities.map(city => (
                                             <li key={city}><a href={`/property/filter/?searchTerm=${city}&businessType=RENT`}>{city}</a></li>
                                         ))}
                                     </ul>
@@ -254,7 +263,7 @@ export default function Header() {
                                 <div id="SELL" className={activeItem === "SELL" ?  `p-4 bg-white shadow-md` : `hidden`}>
                                     <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">City</h1>
                                     <ul className="flex flex-col gap-8">
-                                        {cities.map(city => (
+                                        {sellCities.map(city => (
                                             <li key={city}><a href={`/property/filter/?searchTerm=${city}&businessType=SELL`}>{city}</a></li>
                                         ))}
                                     </ul>

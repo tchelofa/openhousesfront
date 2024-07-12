@@ -156,7 +156,7 @@ export default function Header() {
     return (
         <header className="p-4 shadow-md flex items-center justify-between">
             <div>
-                <a href="/"><img src="/logo.png" alt="Logo" className="w-64" /></a>
+                <a href="/"><img src="/logo2.png" alt="Logo" className="w-64" /></a>
             </div>
             <div className="md:hidden">
                 <button onClick={() => setSidebarOpen(true)}>
@@ -243,7 +243,7 @@ export default function Header() {
                 <div className="fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden overflow-auto" onClick={() => setSidebarOpen(false)}>
                     <div className="fixed inset-y-0 left-0 w-2/3 bg-white shadow-md p-4 overflow-y-auto" ref={menuRef} onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-between mb-4">
-                            <img src="/logo.png" alt="Logo" className="w-48" />
+                            <img src="/logo2.png" alt="Logo" className="w-48" />
                             <button onClick={() => setSidebarOpen(false)}>
                                 <FaTimes className="w-6 h-6" />
                             </button>

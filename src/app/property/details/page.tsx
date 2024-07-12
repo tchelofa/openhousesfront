@@ -9,6 +9,7 @@ import { Carousel } from 'react-responsive-carousel';
 import { MdArrowBackIos } from "react-icons/md";
 import Favorites from '../components/favorites';
 import SendMessage from '../components/sendMessage';
+import Carrossel from '../components/carrossel';
 
 interface HouseDetails {
     id: number;
@@ -54,7 +55,7 @@ interface ImageSchema {
 const HouseDetailsComponent = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const searchTerm = searchParams.get('id');
+    const propertyId = searchParams.get('id'); // Ensure you are getting the correct parameter name
 
     const [houseDetails, setHouseDetails] = useState<HouseDetails | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -71,22 +72,24 @@ const HouseDetailsComponent = () => {
     useEffect(() => {
         const fetchHouseDetails = async () => {
             try {
-                const response = await axios.get<{ property: HouseDetails }>(`${Env.baseurl}/properties/getDetails/${searchTerm}`);
-                if (!response.data.property.active) {
+                const response = await axios.get<{ data: HouseDetails }>(`${Env.baseurl}/properties/getDetails/${propertyId}`);
+                const property = response.data.data;
+                if (!property.active) {
                     router.push('/');
+                } else {
+                    setHouseDetails(property);
                 }
-                setHouseDetails(response.data.property);
-                setIsLoading(false);
             } catch (error) {
                 console.error('Error fetching house details:', error);
+            } finally {
                 setIsLoading(false);
             }
         };
 
         const fetchImages = async () => {
             try {
-                if (searchTerm) {
-                    const response = await axios.get<{ images: ImageSchema[] }>(`${Env.baseurl}/properties/getImages/${searchTerm}`);
+                if (propertyId) {
+                    const response = await axios.get<{ images: ImageSchema[] }>(`${Env.baseurl}/properties/getImages/${propertyId}`);
                     const urls = response.data.images.map(image => image.url);
                     setImages(urls);
                 }
@@ -96,11 +99,11 @@ const HouseDetailsComponent = () => {
             }
         };
 
-        if (searchTerm) {
+        if (propertyId) {
             fetchHouseDetails();
             fetchImages();
         }
-    }, [searchTerm, userId]);
+    }, [propertyId, userId]);
 
     const calculateDaysPassed = (createdAt: string) => {
         const createdDate = new Date(createdAt);
@@ -124,21 +127,9 @@ const HouseDetailsComponent = () => {
                 <div className="flex flex-col sm:flex-row">
                     {/* Main content */}
                     <div className="sm:w-2/3 p-4">
-                        {images.length > 0 ? (
-                            <Carousel showThumbs={false} infiniteLoop useKeyboardArrows autoPlay>
-                                {images.map((imageUrl, index) => (
-                                    <div key={index}>
-                                        <img
-                                            src={imageUrl}
-                                            alt={`House Image ${index + 1}`}
-                                            className="rounded-lg object-cover w-full"
-                                        />
-                                    </div>
-                                ))}
-                            </Carousel>
-                        ) : (
-                            <p>No images available</p>
-                        )}
+                        <Carrossel
+                        propertyId={houseDetails.publicId}
+                        />
                     </div>
 
                     {/* Sidebar */}

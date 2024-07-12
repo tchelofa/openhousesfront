@@ -45,6 +45,7 @@ export default function MyProperties() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [currentPage, setCurrentPage] = useState<number>(1);
+    const [deleteProperty, setDeleteProperty] = useState<any>()
 
     useEffect(() => {
         fetchProperties();
@@ -166,6 +167,22 @@ export default function MyProperties() {
         return pages;
     };
 
+    const handleDeleteProperty = async (propertyId: string) => {
+        try {
+            const propertyDelete = await axios.delete(`${Env.baseurl}/properties/delete/${propertyId}`)
+                .then(response => {
+                    setDeleteProperty(response.data)
+                    toast.success("Your property was deleted with sucess!")
+                })
+                .catch((error) => {
+                    toast.error(error)
+                })
+        } catch (error) {
+
+            console.error('Error toggling property:', error);
+
+        }
+    }
     return (
         <div className="w-full flex flex-col p-10 gap-10">
             <h1 className="text-2xl font-bold">My Properties</h1>
@@ -211,6 +228,12 @@ export default function MyProperties() {
                                                 className={property.active ? 'bg-red-900 text-white p-4 rounded-md' : 'bg-green-800 text-white p-4 rounded-md'}
                                             >
                                                 {property.active ? 'Deactivate' : 'Activate'}
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteProperty(property.publicId)}
+                                                className={property.active ? 'bg-red-900 text-white p-4 rounded-md' : 'bg-green-800 text-white p-4 rounded-md'}
+                                            >
+                                                Delete
                                             </button>
                                         </div>
                                     </td>

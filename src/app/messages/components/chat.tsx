@@ -91,7 +91,7 @@ const Chat: React.FC<ChatProps> = ({ userId }) => {
 
     return (
         <div className="flex h-[calc(100vh-88.52px)] w-screen">
-            <div className="w-1/3 bg-gray-800 text-white overflow-y-auto">
+            <div className="w-1/3 shadow-inner bg-gray-200 text-black overflow-y-auto">
                 {loadingConversations ? (
                     <div className="flex justify-center items-center h-full">
                         <div className="loader"></div>
@@ -100,7 +100,7 @@ const Chat: React.FC<ChatProps> = ({ userId }) => {
                     conversations.map((conversation) => (
                         <div
                             key={conversation.publicId}
-                            className="flex items-center p-4 cursor-pointer hover:bg-gray-700"
+                            className="flex items-center p-4 cursor-pointer hover:bg-gray-200"
                             onClick={() => openChat(conversation.publicId, conversation.name)}
                         >
                             <div>
@@ -113,7 +113,7 @@ const Chat: React.FC<ChatProps> = ({ userId }) => {
 
             {currentChat && (
                 <div className="w-2/3 flex flex-col">
-                    <div className="p-4 bg-gray-100 border-b border-gray-300">
+                    <div className="p-4 shadow-inner border-b border-gray-300">
                         <h2 className="text-xl font-bold">Conversation with {currentContactName}</h2>
                     </div>
                     <div className="flex-1 p-4 overflow-y-auto">
@@ -146,24 +146,24 @@ const Chat: React.FC<ChatProps> = ({ userId }) => {
                             ))
                         )}
                     </div>
-                    <div className="p-4 bg-gray-100 border-t border-gray-300 flex">
+                    <div className="p-4 border-t border-gray-300 flex flex-col gap-4 sm:flex-row">
                         <input
                             type="text"
-                            className="flex-1 p-2 border rounded-lg"
+                            className="flex-1 p-2 border rounded-lg outline-none"
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
-                            placeholder="Enter your message here, please"
+                            placeholder="Enter your message here"
                             disabled={sendingMessage}
                         />
                         <button
-                            className={`ml-2 p-2 rounded-lg text-white ${sendingMessage ? 'bg-gray-500' : 'bg-purple-600 hover:bg-purple-500'}`}
+                            className={`ml-2 p-2 rounded-lg text-white ${sendingMessage ? 'bg-gray-500' : 'bg-sky-600 hover:bg-sky-500'}`}
                             onClick={handleSendMessage}
                             disabled={sendingMessage}
                         >
                             {sendingMessage ? (
                                 <div className="loader"></div>
                             ) : (
-                                "SEND"
+                                "Send"
                             )}
                         </button>
                     </div>

@@ -62,32 +62,6 @@ const HouseDetailsComponent = () => {
     const [userId, setUserId] = useState<string>('');
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-    useEffect(() => {
-        const userIdFromLocalStorage = localStorage.getItem("id");
-        if (userIdFromLocalStorage) {
-            setUserId(userIdFromLocalStorage);
-        }
-
-        const token = localStorage.getItem('token');
-        if (token) {
-            axios.post(`${Env.baseurl}/auth/token-validate`, { token }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then((response) => {
-                if (response.status === 200) {
-                    setIsAuthenticated(true);
-                }
-            })
-            .catch((error) => {
-                console.error('Token verification failed', error);
-                localStorage.removeItem('token');
-                localStorage.removeItem('id');
-            });
-        }
-    }, []);
 
     useEffect(() => {
         const fetchHouseDetails = async () => {
@@ -109,9 +83,13 @@ const HouseDetailsComponent = () => {
         const fetchImages = async () => {
             try {
                 if (propertyId) {
-                    const response = await axios.get<{ images: ImageSchema[] }>(`${Env.baseurl}/properties/getImages/${propertyId}`);
-                    const urls = response.data.images.map(image => image.url);
-                    setImages(urls);
+                    const response = await axios.get<{ data: ImageSchema[] }>(`${Env.baseurl}/properties/getImages/${propertyId}`);
+                    if (response.data && response.data.data) {
+                        const urls = response.data.data.map(image => image.url);
+                        setImages(urls);
+                    } else {
+                        setImages([]);
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching property images:', error);

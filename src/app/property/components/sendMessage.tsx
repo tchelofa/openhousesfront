@@ -1,5 +1,115 @@
-export default function SendMessage(){
-    return(
-        <button className="bg-sky-800 text-white p-2 my-4 rounded-md cursor-pointer">Send Message</button>
-    )
+'use client';
+import { useState, useEffect } from 'react';
+import Modal from 'react-modal';
+import axios from 'axios';
+import { Env } from '@/lib/Env';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+interface SendMessageProps {
+    propertyOwnerId: string; // ID do proprietário da propriedade
+}
+
+export default function SendMessage({ propertyOwnerId }: SendMessageProps) {
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [message, setMessage] = useState('');
+    const [userId, setUserId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const userIdFromLocalStorage = localStorage.getItem("id");
+        if (userIdFromLocalStorage) {
+            setUserId(userIdFromLocalStorage);
+        }
+
+    }, []);
+
+    const openModal = () => {
+        if (!userId) {
+            toast.error('Please sign in to send a message.');
+            return;
+        }
+        setModalIsOpen(true);
+    };
+
+    const closeModal = () => {
+        setModalIsOpen(false);
+    };
+
+    const handleSendMessage = async () => {
+        if (!message.trim()) {
+            toast.error('Message cannot be empty.');
+            return;
+        }
+
+        try {
+            const response = await axios.post(`${Env.baseurl}/messages/conversations/send`, {
+                userFromPublicId: userId,
+                userToId: propertyOwnerId,
+                message
+            });
+
+            if (response.status === 200) {
+                toast.success('Message sent successfully.');
+                setMessage('');
+                closeModal();
+            } else {
+                toast.error('Failed to send message.');
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+            toast.error('Error sending message.');
+        }
+    };
+
+    return (
+        <>
+            <button
+                className="bg-sky-800 text-white p-2 my-4 rounded-md cursor-pointer"
+                onClick={openModal}
+            >
+                Send Message
+            </button>
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                ariaHideApp={false}
+                contentLabel="Send Message"
+                className="bg-white p-6 rounded-lg shadow-lg max-w-md mx-auto mt-10"
+                overlayClassName="fixed inset-0 bg-black bg-opacity-50"
+            >
+                <h2 className="text-xl font-bold mb-4">Send Message</h2>
+                <textarea
+                    className="w-full border p-2 rounded-md mb-4"
+                    rows={5}
+                    placeholder="Type your message here..."
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                ></textarea>
+                <button
+                    className="bg-sky-800 text-white p-2 rounded-md cursor-pointer"
+                    onClick={handleSendMessage}
+                >
+                    Send
+                </button>
+                <button
+                    className="bg-gray-500 text-white p-2 rounded-md cursor-pointer ml-4"
+                    onClick={closeModal}
+                >
+                    Cancel
+                </button>
+            </Modal>
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+            />
+        </>
+    );
 }

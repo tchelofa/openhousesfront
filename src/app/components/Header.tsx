@@ -132,7 +132,7 @@ export default function Header() {
                 }
             });
             const properties = response.data.data;
-            
+
             if (Array.isArray(properties)) {
                 const uniqueCities = Array.from(new Set(properties.map(property => property.city)));
                 if (businessType === 'RENT') {
@@ -147,8 +147,8 @@ export default function Header() {
             console.error('Error fetching properties:', error);
         }
     };
-    
-    useEffect(() => {    
+
+    useEffect(() => {
         fetchCities('RENT');
         fetchCities('SELL');
     }, []);
@@ -165,7 +165,7 @@ export default function Header() {
             </div>
             <nav className="hidden md:flex items-center gap-4" ref={menuRef}>
                 <LinkHeader title="RENT" onClick={() => handleClick("RENT")}>
-                    <div id="RENT" className={activeItem === "RENT" ?  `p-10 absolute top-16 left-0 w-[400px] bg-white shadow-md z-40` : `hidden`}>
+                    <div id="RENT" className={activeItem === "RENT" ? `p-10 absolute top-16 left-0 w-[400px] bg-white shadow-md z-40` : `hidden`}>
                         <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">City</h1>
                         <ul className="flex flex-col gap-8">
                             {rentCities.map(city => (
@@ -175,7 +175,7 @@ export default function Header() {
                     </div>
                 </LinkHeader>
                 <LinkHeader title="SELL" onClick={() => handleClick("SELL")}>
-                    <div id="SELL" className={activeItem === "SELL" ?  `p-10 absolute top-16 left-0 w-[400px] bg-white shadow-md z-40` : `hidden`}>
+                    <div id="SELL" className={activeItem === "SELL" ? `p-10 absolute top-16 left-0 w-[400px] bg-white shadow-md z-40` : `hidden`}>
                         <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">City</h1>
                         <ul className="flex flex-col gap-8">
                             {sellCities.map(city => (
@@ -250,7 +250,7 @@ export default function Header() {
                         </div>
                         <nav className="flex flex-col gap-4  overflow-y-auto">
                             <LinkHeader title="RENT" onClick={() => handleClick("RENT")}>
-                                <div id="RENT" className={activeItem === "RENT" ?   `p-4 bg-white shadow-md` : `hidden`}>
+                                <div id="RENT" className={activeItem === "RENT" ? `p-4 bg-white shadow-md` : `hidden`}>
                                     <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">City</h1>
                                     <ul className="flex flex-col gap-8">
                                         {rentCities.map(city => (
@@ -260,7 +260,7 @@ export default function Header() {
                                 </div>
                             </LinkHeader>
                             <LinkHeader title="SELL" onClick={() => handleClick("SELL")}>
-                                <div id="SELL" className={activeItem === "SELL" ?  `p-4 bg-white shadow-md` : `hidden`}>
+                                <div id="SELL" className={activeItem === "SELL" ? `p-4 bg-white shadow-md` : `hidden`}>
                                     <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">City</h1>
                                     <ul className="flex flex-col gap-8">
                                         {sellCities.map(city => (
@@ -273,11 +273,11 @@ export default function Header() {
                                 <div id="ADVERTISE" className={activeItem == "ADVERTISE" ? `p-4 bg-white shadow-md` : `hidden`}>
                                     <h1 className="font-bold text-xl border-b-2 border-gray-200 mb-4">Advertise on OpenHouses</h1>
                                     <ul className="flex flex-col gap-4">
-                                        <li>Advertise Houses</li>
-                                        <li>Advertise Flats</li>
-                                        <li>Advertise Single Room</li>
-                                        <li>Advertise Shared Room</li>
-                                        <li>Advertise Double Room</li>
+                                        <li><a href="/auth/register/advertisor">Advertise Houses</a></li>
+                                        <li><a href="/auth/register/advertisor">Advertise Flats</a></li>
+                                        <li><a href="/auth/register/advertisor">Advertise Single Room</a> </li>
+                                        <li><a href="/auth/register/advertisor">Advertise Shared Room</a> </li>
+                                        <li><a href="/auth/register/advertisor">Advertise Double Room</a> </li>
                                     </ul>
                                 </div>
                             </LinkHeader>

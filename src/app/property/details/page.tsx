@@ -5,7 +5,6 @@ import axios from 'axios';
 import { Env } from '@/lib/Env';
 import { useRouter } from 'next/navigation';
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // Required for carousel styles
-import { Carousel } from 'react-responsive-carousel';
 import { MdArrowBackIos } from "react-icons/md";
 import Favorites from '../components/favorites';
 import SendMessage from '../components/sendMessage';
@@ -60,12 +59,33 @@ const HouseDetailsComponent = () => {
     const [houseDetails, setHouseDetails] = useState<HouseDetails | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [images, setImages] = useState<string[]>([]);
-    const [userId, setUserId] = useState<any>(null);
+    const [userId, setUserId] = useState<string>('');
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
     useEffect(() => {
         const userIdFromLocalStorage = localStorage.getItem("id");
         if (userIdFromLocalStorage) {
             setUserId(userIdFromLocalStorage);
+        }
+
+        const token = localStorage.getItem('token');
+        if (token) {
+            axios.post(`${Env.baseurl}/auth/token-validate`, { token }, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                if (response.status === 200) {
+                    setIsAuthenticated(true);
+                }
+            })
+            .catch((error) => {
+                console.error('Token verification failed', error);
+                localStorage.removeItem('token');
+                localStorage.removeItem('id');
+            });
         }
     }, []);
 
@@ -103,7 +123,7 @@ const HouseDetailsComponent = () => {
             fetchHouseDetails();
             fetchImages();
         }
-    }, [propertyId, userId]);
+    }, [propertyId]);
 
     const calculateDaysPassed = (createdAt: string) => {
         const createdDate = new Date(createdAt);
@@ -127,18 +147,21 @@ const HouseDetailsComponent = () => {
                 <div className="flex flex-col sm:flex-row">
                     {/* Main content */}
                     <div className="sm:w-2/3 p-4">
-                        <Carrossel
-                        propertyId={houseDetails.publicId}
-                        />
+                        <Carrossel propertyId={houseDetails.publicId} />
                     </div>
 
                     {/* Sidebar */}
                     <div className="sm:w-1/3 p-4">
                         <div className="">
                             <h2 className="text-3xl font-semibold mb-4">{houseDetails.title}</h2>
-                            <Favorites userId={userId} propertyId={houseDetails.publicId} />
+                            {userId && <Favorites userId={userId} propertyId={houseDetails.publicId} />}
+                            {isAuthenticated ? (
+                                <SendMessage propertyOwnerId={houseDetails.userId} />
+                            ) : (
+                                <p className='bg-red-800 text-white p-4 my-4'>Please sign in to send a message.</p>
+                            )}
                         </div>
-                        <p className="text-lg mb-4">{houseDetails.description}</p>
+                        <p className="text-lg mb-4"><span className='font-bold text-xl'>Description:</span> <br/>{houseDetails.description}</p>
                         <div className='font-bold text-xl'>Details</div>
                         <table className="table w-full">
                             <tbody>
@@ -216,7 +239,7 @@ const HouseDetailsComponent = () => {
                                 </tr>
                             </tbody>
                         </table>
-                        <SendMessage />
+                        
                     </div>
                 </div>
             ) : (

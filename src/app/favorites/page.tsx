@@ -152,7 +152,7 @@ export default function Favorites() {
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
                 contentLabel="Confirm Remove Property"
-                ariaHideApp={false} // Use this line to temporarily disable the warning (not recommended for production)
+                ariaHideApp={true}
                 style={{
                     overlay: {
                         backgroundColor: 'rgba(0, 0, 0, 0.7)', // Set background color and opacity

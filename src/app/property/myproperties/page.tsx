@@ -7,9 +7,41 @@ import { instance as axios } from '@/lib/axiosConfig';
 
 const ITEMS_PER_PAGE = 10;
 
+interface PropertySchema {
+    id: number;
+    publicId: string;
+    title: string;
+    description: string;
+    address: string;
+    neighborhood: string;
+    city: string;
+    county: string;
+    country: string;
+    postcode: string;
+    price: string;
+    propertyType: string;
+    rooms: string;
+    capacity: string;
+    toilets: string;
+    externalArea: string;
+    electricityFee: string;
+    wifiFee: string;
+    rubbishFee: string;
+    depositFee: string;
+    timeRefundDeposit: string;
+    availableAtInit: string;
+    availableAtEnd: string;
+    active: boolean;
+    userId: string;
+    updatedAt: string;
+    createdAt: string;
+    businessType: 'RENT' | 'SELL';
+}
+
 export default function MyProperties() {
-    const [properties, setProperties] = useState<any[]>([]);
-    const [filteredProperties, setFilteredProperties] = useState<any[]>([]);
+    const [rentProperties, setRentProperties] = useState<PropertySchema[]>([]);
+    const [sellProperties, setSellProperties] = useState<PropertySchema[]>([]);
+    const [filteredProperties, setFilteredProperties] = useState<PropertySchema[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -20,7 +52,7 @@ export default function MyProperties() {
 
     useEffect(() => {
         filterProperties(searchTerm);
-    }, [searchTerm]);
+    }, [searchTerm, rentProperties, sellProperties]);
 
     const fetchProperties = async () => {
         setIsLoading(true);
@@ -30,21 +62,23 @@ export default function MyProperties() {
                 toast.error('User ID not found in local storage');
                 return;
             }
-    
-            const response = await axios.get(`${Env.baseurl}/properties`, {
-                params: {
-                    userId: id,
-                },
-            });
-    
-            if (response.status === 200) {
-                const fetchedProperties = response.data.properties.map((property: any) => ({
-                    ...property,
-                    isActive: property.active
+
+            const [rentResponse, sellResponse] = await Promise.all([
+                axios.get(`${Env.baseurl}/properties/filtered`, { params: { userId: id, businessType: 'RENT' } }),
+                axios.get(`${Env.baseurl}/properties/filtered`, { params: { userId: id, businessType: 'SELL' } })
+            ]);
+
+            if (rentResponse.status === 200 && sellResponse.status === 200) {
+                const fetchedRentProperties = rentResponse.data.data.map((property: PropertySchema) => ({
+                    ...property
                 }));
-    
-                setProperties(fetchedProperties);
-                setFilteredProperties(fetchedProperties);
+                const fetchedSellProperties = sellResponse.data.data.map((property: PropertySchema) => ({
+                    ...property
+                }));
+
+                setRentProperties(fetchedRentProperties);
+                setSellProperties(fetchedSellProperties);
+                setFilteredProperties([...fetchedRentProperties, ...fetchedSellProperties]);
             } else {
                 toast.error('Failed to fetch properties');
             }
@@ -55,13 +89,14 @@ export default function MyProperties() {
             setIsLoading(false);
         }
     };
+
     const filterProperties = (term: string) => {
         if (!term) {
-            setFilteredProperties(properties);
+            setFilteredProperties([...rentProperties, ...sellProperties]);
         } else {
             const lowerCaseTerm = term.toLowerCase();
-            const filtered = properties.filter((property) =>
-                Object.values(property).some((value:any) =>
+            const filtered = [...rentProperties, ...sellProperties].filter((property) =>
+                Object.values(property).some((value: any) =>
                     value.toString().toLowerCase().includes(lowerCaseTerm)
                 )
             );
@@ -75,7 +110,7 @@ export default function MyProperties() {
 
     const handleToggleProperty = async (id: string) => {
         try {
-            const propertyToToggle = properties.find(property => property.publicId === id);
+            const propertyToToggle = filteredProperties.find(property => property.publicId === id);
             if (!propertyToToggle) {
                 toast.error('Property not found');
                 return;
@@ -84,20 +119,21 @@ export default function MyProperties() {
             const response = await axios.put(`${Env.baseurl}/properties/toogleproperty/${id}`);
 
             if (response.status === 200) {
-                const updatedProperties = properties.map(property => {
+                const updatedProperties = filteredProperties.map(property => {
                     if (property.publicId === id) {
                         return {
                             ...property,
-                            isActive: !property.isActive  // Alternar o estado isActive da propriedade específica
+                            active: !property.active  // Alternar o estado active da propriedade específica
                         };
                     }
                     return property;
                 });
 
-                setProperties(updatedProperties);
+                setRentProperties(updatedProperties.filter(property => property.businessType === 'RENT'));
+                setSellProperties(updatedProperties.filter(property => property.businessType === 'SELL'));
                 setFilteredProperties(updatedProperties);
 
-                const newState = propertyToToggle.isActive ? 'deactivated' : 'activated';
+                const newState = propertyToToggle.active ? 'deactivated' : 'activated';
                 toast.success(`Property ${newState} successfully`);
             } else {
                 toast.error('Failed to toggle property');
@@ -162,19 +198,19 @@ export default function MyProperties() {
                         <tbody>
                             {currentItems.map((property) => (
                                 <tr key={property.publicId}>
-                                    <td><a href={`/property/detail/?id=${property.publicId}`}>{property.title}</a></td>
+                                    <td><a href={`/property/details/?id=${property.publicId}`}>{property.title}</a></td>
                                     <td>{property.description}</td>
-                                    <td>{property.address}</td>
+                                    <td>{`${property.address}, ${property.neighborhood}, ${property.city}, ${property.county}, ${property.country}`}</td>
                                     <td>{property.propertyType}</td>
-                                    <td>{property.createdAt}</td>
+                                    <td>{new Date(property.createdAt).toLocaleDateString()}</td>
                                     <td>
                                         <div className="flex gap-4">
                                             <a href={`/property/update/${property.publicId}`} className="bg-sky-900 text-white p-4 rounded-md">Update</a>
                                             <button
                                                 onClick={() => handleToggleProperty(property.publicId)}
-                                                className={property.isActive ? 'bg-red-900 text-white p-4 rounded-md' : 'bg-green-800 text-white p-4 rounded-md'}
+                                                className={property.active ? 'bg-red-900 text-white p-4 rounded-md' : 'bg-green-800 text-white p-4 rounded-md'}
                                             >
-                                                {property.isActive ? 'Deactivate' : 'Activate'}
+                                                {property.active ? 'Deactivate' : 'Activate'}
                                             </button>
                                         </div>
                                     </td>

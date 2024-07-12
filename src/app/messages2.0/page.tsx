@@ -12,6 +12,7 @@ export default function Home() {
 
   return (
     <div>
+
       <Chat userId={userId} />
     </div>
   );

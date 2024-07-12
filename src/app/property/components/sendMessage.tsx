@@ -5,15 +5,18 @@ import axios from 'axios';
 import { Env } from '@/lib/Env';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useRouter } from 'next/navigation';
 
 interface SendMessageProps {
     propertyOwnerId: string; // ID do proprietário da propriedade
 }
 
 export default function SendMessage({ propertyOwnerId }: SendMessageProps) {
+    const router = useRouter()
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [message, setMessage] = useState('');
     const [userId, setUserId] = useState<string | null>(null);
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
 
     useEffect(() => {
         const userIdFromLocalStorage = localStorage.getItem("id");
@@ -42,7 +45,7 @@ export default function SendMessage({ propertyOwnerId }: SendMessageProps) {
         }
 
         try {
-            const response = await axios.post(`${Env.baseurl}/messages/conversations/send`, {
+            const response = await axios.post(`${Env.baseurl}/messages/send`, {
                 userFromPublicId: userId,
                 userToId: propertyOwnerId,
                 message
@@ -61,14 +64,41 @@ export default function SendMessage({ propertyOwnerId }: SendMessageProps) {
         }
     };
 
+    useEffect(() => {
+        const token = localStorage.getItem('token')
+        if (token) {
+            axios.post(`${Env.baseurl}/auth/token-validate`, { token }, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then((response) => {
+                    if (response.status === 200) {
+                        setIsAuthenticated(true)
+                    }
+                })
+                .catch((error) => {
+                    console.error('Token verification failed', error)
+                    localStorage.removeItem('token')
+                    localStorage.removeItem('id')
+                })
+        }
+    }, [])
+
     return (
         <>
-            <button
-                className="bg-sky-800 text-white p-2 my-4 rounded-md cursor-pointer"
-                onClick={openModal}
-            >
-                Send Message
-            </button>
+            {isAuthenticated ? (
+                <button
+                    className="bg-sky-800 text-white p-2 my-4 rounded-md cursor-pointer"
+                    onClick={openModal}
+                >
+                    Send Message
+                </button>
+            ) : (
+                <p className='bg-red-800 text-white p-4 my-4'>Please sign in to send a message.</p>
+            )}
+
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}

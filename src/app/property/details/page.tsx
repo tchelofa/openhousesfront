@@ -133,11 +133,7 @@ const HouseDetailsComponent = () => {
                         <div className="">
                             <h2 className="text-3xl font-semibold mb-4">{houseDetails.title}</h2>
                             {userId && <Favorites userId={userId} propertyId={houseDetails.publicId} />}
-                            {isAuthenticated ? (
-                                <SendMessage propertyOwnerId={houseDetails.userId} />
-                            ) : (
-                                <p className='bg-red-800 text-white p-4 my-4'>Please sign in to send a message.</p>
-                            )}
+                            <SendMessage propertyOwnerId={houseDetails.userId} />
                         </div>
                         <p className="text-lg mb-4"><span className='font-bold text-xl'>Description:</span> <br/>{houseDetails.description}</p>
                         <div className='font-bold text-xl'>Details</div>

@@ -154,6 +154,12 @@ const Chat: React.FC<ChatProps> = ({ userId }) => {
                             onChange={(e) => setNewMessage(e.target.value)}
                             placeholder="Enter your message here"
                             disabled={sendingMessage}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !sendingMessage) {
+                                    e.preventDefault(); // Evita a quebra de linha ao pressionar Enter
+                                    handleSendMessage();
+                                }
+                            }}
                         />
                         <button
                             className={`ml-2 p-2 rounded-lg text-white ${sendingMessage ? 'bg-gray-500' : 'bg-sky-600 hover:bg-sky-500'}`}

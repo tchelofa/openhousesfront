@@ -223,7 +223,7 @@ export default function Header() {
                                 <button className="bg-red-600 text-white w-full p-4 mb-4 rounded-md hover:bg-red-800" onClick={handleLogout}>Logout</button>
                                 <ul className="flex flex-col gap-8">
                                     <li className="flex items-center gap-4"><TiHeartOutline /> <a href="/favorites">Favorites and Lists</a></li>
-                                    <li className="flex items-center gap-4"><HiOutlineBellAlert />Alerts Created</li>
+                                    {/* <li className="flex items-center gap-4"><HiOutlineBellAlert />Alerts Created</li> */}
                                     <li className="flex items-center gap-4"><BsHouses /> <a href="/property/myproperties">My Properties</a></li>
                                     <li className="flex items-center gap-4"><RiMessageLine /> <a href="/messages">Messages</a></li>
                                 </ul>
@@ -306,7 +306,7 @@ export default function Header() {
                                             <button className="bg-red-600 text-white w-full p-4 mb-4 rounded-md hover:bg-red-800" onClick={handleLogout}>Logout</button>
                                             <ul className="flex flex-col gap-4">
                                                 <li className="flex flex-row gap-1 items-center space-around"><TiHeartOutline /> <a href="/favorites">Favorites and Lists</a></li>
-                                                <li className="flex flex-row gap-1 items-center space-around"><HiOutlineBellAlert /> Alerts Created</li>
+                                                {/* <li className="flex flex-row gap-1 items-center space-around"><HiOutlineBellAlert /> Alerts Created</li> */}
                                                 <li className="flex flex-row gap-1 items-center space-around"><BsHouses /> <a href="/property/myproperties">My Properties</a></li>
                                                 <li className="flex flex-row gap-1 items-center space-around"><RiMessageLine /> <a href="/messages">Messages</a></li>
                                             </ul>

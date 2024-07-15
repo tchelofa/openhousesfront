@@ -62,7 +62,6 @@ const HouseDetailsComponent = () => {
     const [userId, setUserId] = useState<string>('');
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-
     useEffect(() => {
         const fetchHouseDetails = async () => {
             try {

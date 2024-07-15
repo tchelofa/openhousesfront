@@ -89,9 +89,12 @@ function PropertyFilterPage() {
                 <h1 className="text-3xl font-bold mb-4">Filtered Properties</h1>
                 {properties.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                        {properties.map(property => (
-                            <Card key={property.id} property={property} />
-                        ))}
+                        {properties
+                            .filter(property => property.active)
+                            .map(property => (
+                                <Card key={property.id} property={property} />
+                            ))
+                        }
                     </div>
                 ) : (
                     <p>No properties found.</p>

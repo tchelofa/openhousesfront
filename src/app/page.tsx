@@ -9,7 +9,6 @@ export default function Home() {
 
   return (
     <div>
-      <MessageHeader />
       <Header />
       <MainPage />
     </div>

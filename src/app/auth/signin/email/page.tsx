@@ -76,7 +76,7 @@ export default function EmailSignIn() {
     return (
         <>
             <main className="w-full max-w-lg mx-auto mt-10 px-4 flex flex-col items-start gap-4">
-                <img src="/logo.png" alt="Logo" className="w-[200px] mb-10" />
+                <img src="/logo2.png" alt="Logo" className="w-[200px] mb-10" />
                 <h1 className="text-xl font-bold">Are you new here?</h1>  <a href="/auth/register">Create an account.</a>
                 <div className=" w-full h-4 border-b-2"></div>
                 <h1 className="font-bold text-2xl">Sign in with email.</h1>

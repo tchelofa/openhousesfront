@@ -60,7 +60,7 @@ export default function EmailSignIn() {
     return (
         <>
             <main className="w-full max-w-lg mx-auto mt-10 px-4 flex flex-col items-start gap-4">
-                <img src="/logo.png" alt="Logo" className="w-[200px] mb-10" />
+                <img src="/logo2.png" alt="Logo" className="w-[200px] mb-10" />
                 <h1 className="font-bold text-2xl">Register your new account.</h1>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
                     <label htmlFor="name">Name</label>

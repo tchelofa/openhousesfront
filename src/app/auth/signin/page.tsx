@@ -15,7 +15,7 @@ export default function Signin() {
         <div>
             
             <main className="w-full max-w-md mx-auto mt-10 px-4 flex flex-col items-start gap-4">
-                <img src="/logo.png" alt="Logo" className="w-[200px] mb-10 self-center"/>
+                <img src="/logo2.png" alt="Logo" className="w-[200px] mb-10 self-center"/>
                 <h1 className="text-xl font-bold">Are you new here?</h1>  <a href="/auth/register">Create an account.</a>
                 <div className=" w-full h-4 border-b-2"></div>
                 <h1 className="font-bold text-2xl">Sign in.</h1>

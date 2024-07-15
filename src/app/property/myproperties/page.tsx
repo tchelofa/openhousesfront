@@ -47,13 +47,9 @@ export default function MyProperties() {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [deleteProperty, setDeleteProperty] = useState<any>()
 
-    useEffect(() => {
-        fetchProperties();
-    }, []);
+    
 
-    useEffect(() => {
-        filterProperties(searchTerm);
-    }, [searchTerm, rentProperties, sellProperties]);
+    
 
     const fetchProperties = async () => {
         setIsLoading(true);
@@ -67,6 +63,7 @@ export default function MyProperties() {
             const [rentResponse, sellResponse] = await Promise.all([
                 axios.get(`${Env.baseurl}/properties/filtered`, { params: { userId: id, businessType: 'RENT' } }),
                 axios.get(`${Env.baseurl}/properties/filtered`, { params: { userId: id, businessType: 'SELL' } })
+                
             ]);
 
             if (rentResponse.status === 200 && sellResponse.status === 200) {
@@ -90,6 +87,14 @@ export default function MyProperties() {
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        filterProperties(searchTerm);
+    }, [searchTerm, rentProperties, sellProperties]);
+
+    useEffect(() => {
+        fetchProperties();
+    }, []);
 
     const filterProperties = (term: string) => {
         if (!term) {

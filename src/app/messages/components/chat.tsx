@@ -91,7 +91,7 @@ const Chat: React.FC<ChatProps> = ({ userId }) => {
 
     return (
         <div className="flex h-[calc(100vh-88.52px)] w-screen">
-            <div className="w-1/3 shadow-inner bg-gray-200 text-black overflow-y-auto">
+            <div className="w-1/3 shadow-md bg-gray-50 text-black overflow-y-auto">
                 {loadingConversations ? (
                     <div className="flex justify-center items-center h-full">
                         <div className="loader"></div>
@@ -100,7 +100,7 @@ const Chat: React.FC<ChatProps> = ({ userId }) => {
                     conversations.map((conversation) => (
                         <div
                             key={conversation.publicId}
-                            className="flex items-center p-4 cursor-pointer hover:bg-gray-200"
+                            className="flex items-center p-4 cursor-pointer hover:bg-gray-200 border-b"
                             onClick={() => openChat(conversation.publicId, conversation.name)}
                         >
                             <div>
@@ -113,8 +113,8 @@ const Chat: React.FC<ChatProps> = ({ userId }) => {
 
             {currentChat && (
                 <div className="w-2/3 flex flex-col">
-                    <div className="p-4 shadow-inner border-b border-gray-300">
-                        <h2 className="text-xl font-bold">Conversation with {currentContactName}</h2>
+                    <div className="p-4 shadow-inner bg-gray-50">
+                        <h2 className="text-xl font-bold">{currentContactName}</h2>
                     </div>
                     <div className="flex-1 p-4 overflow-y-auto">
                         {loadingMessages ? (

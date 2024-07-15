@@ -46,10 +46,11 @@ export default function SendMessage({ propertyOwnerId }: SendMessageProps) {
 
         try {
             const response = await axios.post(`${Env.baseurl}/messages/send`, {
-                userFromPublicId: userId,
+                userFromId: userId,
                 userToId: propertyOwnerId,
                 message
             });
+            console.log(userId, propertyOwnerId, message)
 
             if (response.status === 200) {
                 toast.success('Message sent successfully.');

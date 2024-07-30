@@ -1,7 +1,8 @@
+import { Env } from '@/lib/Env';
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3333/messages', // Altere para a URL do seu backend
+  baseURL: `${Env.baseurl}/messages`, // Altere para a URL do seu backend
 });
 
 interface SendMessageData {

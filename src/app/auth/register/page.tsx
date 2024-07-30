@@ -6,6 +6,7 @@ import { Env } from '../../../lib/Env';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { isAxiosError } from "axios";
+import { SpinningCircles } from "react-loading-icons";
 
 export default function EmailSignIn() {
     const router = useRouter();
@@ -71,7 +72,9 @@ export default function EmailSignIn() {
                     <input type="password" placeholder='Minimun 6 characters' className='border border-gray-300 p-4 w-full outline-none focus:shadow-md' name="password" id="password" />
                     <label htmlFor="mobile">Mobile</label>
                     <input type="text" placeholder='Your mobile number' className='border border-gray-300 p-4 w-full outline-none focus:shadow-md' name="mobile" id="mobile" />
-                    <button className='p-4 bg-sky-700 text-white w-full rounded-md hover:bg-sky-900'>Register</button>
+                    <button className='p-4 bg-sky-700 text-white w-full rounded-md hover:bg-sky-900 flex items-center justify-center'>
+                        {isLoading ? <SpinningCircles className='w-5 h-5' /> : "Register"}
+                    </button>
                     <div>
                         Already have an account? <a href="/auth/signin">Sign In</a>
                     </div>

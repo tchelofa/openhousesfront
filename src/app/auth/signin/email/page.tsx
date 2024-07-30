@@ -54,6 +54,7 @@ export default function EmailSignIn() {
             await axios.post(`${Env.baseurl}/auth/signin`, formProps)
                 .then((response) => {
                     localStorage.setItem('token', response.data.token)
+                    
                     localStorage.setItem('id', response.data.id)
                     setIsAuthenticated(true)
                     router.push('/')
@@ -90,7 +91,7 @@ export default function EmailSignIn() {
                         <input type="text" placeholder='name@example.com' className='border border-gray-300 p-4 w-full outline-none focus:shadow-md' id='email' name='email' />
                         <label htmlFor="password">Password</label>
                         <input type="password" placeholder='Your password' className='border border-gray-300 p-4 w-full outline-none focus:shadow-md' id='password' name='password'/>
-                        <button className='p-4 bg-sky-700 text-white w-full rounded-md hover:bg-sky-900' type='submit'>
+                        <button className='p-4 bg-sky-700 text-white w-full rounded-md hover:bg-sky-900 flex items-center justify-center' type='submit'>
                             {isLoading ? <SpinningCircles className='w-5 h-5' /> : "Sign In"}
                         </button>
                         <div>

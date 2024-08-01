@@ -190,7 +190,9 @@ export default function UpdateProperty() {
 
             if (response.data.status === 'success') {
                 toast.success(response.data.message);
-                router.push('/my-properties');
+                setInterval(()=>{
+                    router.refresh()
+                }, 2000)
             } else {
                 toast.error(response.data.message);
             }
@@ -251,6 +253,9 @@ export default function UpdateProperty() {
                 }
 
                 console.log('Upload successful:', response.data);
+                setInterval(()=>{
+                    router.refresh()
+                }, 2000)
             } catch (error: any) {
                 console.error('Error uploading files:', error);
                 toast.error(error.response?.data?.message || 'Failed to upload files');
@@ -270,6 +275,9 @@ export default function UpdateProperty() {
                     ...prevProperty,
                     images: prevProperty.images.filter(img => img !== image)
                 }));
+                setInterval(()=>{
+                    router.refresh()
+                }, 2000)
             } else {
                 toast.error(response.data.message);
             }

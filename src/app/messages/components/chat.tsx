@@ -155,7 +155,7 @@ const Chat: React.FC<ChatProps> = ({ userId }) => {
                     <div className="p-4 flex flex-col gap-4 sm:flex-row bg-[#202c33]">
                         <input
                             type="text"
-                            className="flex-1 p-4 rounded-lg outline-none bg-[#2a3942]"
+                            className="flex-1 p-4 rounded-lg outline-none bg-[#2a3942] text-white"
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                             placeholder="Enter your message here"

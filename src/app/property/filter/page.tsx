@@ -102,7 +102,7 @@ function PropertyFilterPage() {
 
     return (
         <div className="p-4 flex w-full flex-col sm:flex-row">
-            <div className='w-1/6'>
+            <div className='w-full sm:w-1/4 lg:w-1/6 mb-4 sm:mb-0'>
                 <Filter onFilterChange={handleFilterChange} />
             </div>
 
@@ -116,7 +116,7 @@ function PropertyFilterPage() {
                     }
                 </h1>
                 {properties.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
                         {properties
                             .filter(property => property.active)
                             .map(property => (

@@ -105,7 +105,7 @@ export default function SendMessage({ propertyOwnerId }: SendMessageProps) {
                 onRequestClose={closeModal}
                 ariaHideApp={false}
                 contentLabel="Send Message"
-                className="bg-white p-6 rounded-lg shadow-lg max-w-md mx-auto mt-10"
+                className="bg-white p-6 rounded-lg shadow-lg max-w-md mx-auto mt-10 z-50"
                 overlayClassName="fixed inset-0 bg-black bg-opacity-50"
             >
                 <h2 className="text-xl font-bold mb-4">Send Message</h2>

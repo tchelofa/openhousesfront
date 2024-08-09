@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'
 import Favorite from './favorites'
 import Carrossel from './carrossel'
-import { Env } from '@/lib/Env'
 import SendMessage from './sendMessage'
 
 interface PropertySchema {
@@ -51,29 +50,29 @@ const Card: React.FC<CardProps> = ({ property }) => {
     }, [])
 
     return (
-
         <div className="card border rounded-lg overflow-hidden shadow-lg">
-            <a href={`/property/details/?id=${property.publicId}`}><Carrossel propertyId={property.publicId} /></a>
+            <div className="image-container">
+                <Carrossel propertyId={property.publicId} />
+            </div>
             <div className="card-body p-4">
-                <h5 className="card-title font-bold text-xl flex items-center justify-between">
+                <h5 className="card-title font-bold text-xl flex items-center justify-between mb-4">
                     <a href={`/property/details/?id=${property.publicId}`}>{property.title}</a>
                     <Favorite userId={userId} propertyId={property.publicId} />
                 </h5>
                 <a href={`/property/details/?id=${property.publicId}`}>
                     <p className="card-text text-gray-700">{property.description}</p>
-                    <p className="card-text text-gray-700">
+                    <p className="card-text text-gray-700 mb-4">
                         {property.address}, {property.neighborhood}, {property.city}, {property.county}, {property.country}
                     </p>
-                    <p className="card-text text-gray-700">Price: {property.price}</p>
-                    <p className="card-text text-gray-700">Type: {property.propertyType}</p>
-                    <p className="card-text text-gray-700">Rooms: {property.rooms}</p>
-                    <p className="card-text text-gray-700">Capacity: {property.capacity}</p>
-                    <p className="card-text text-gray-700">Toilets: {property.toilets}</p>
-                    <p className="card-text text-gray-700">Business Type: {property.businessType}</p>
+                    <p className="card-text text-gray-700"><strong>Price:</strong> € {property.price}</p><hr className='my-2'/>
+                    <p className="card-text text-gray-700"><strong>Type:</strong> {property.propertyType}</p><hr className='my-2'/>
+                    <p className="card-text text-gray-700"><strong>Rooms:</strong> {property.rooms}</p><hr className='my-2'/>
+                    <p className="card-text text-gray-700"><strong>Capacity:</strong> {property.capacity}</p><hr className='my-2'/>
+                    <p className="card-text text-gray-700"><strong>Toilets:</strong> {property.toilets}</p><hr className='my-2'/>
+                    <p className="card-text text-gray-700"><strong>Business Type: </strong> {property.businessType}</p>
                 </a>
             </div>
         </div>
-
     )
 }
 

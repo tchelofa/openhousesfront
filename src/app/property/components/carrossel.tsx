@@ -52,7 +52,7 @@ export default function Carrossel({ propertyId }: CarrosselProps) {
 
     return (
         <div className="carouselContainer">
-            <Carousel showThumbs={false} infiniteLoop useKeyboardArrows autoPlay>
+            <Carousel showThumbs={false} infiniteLoop useKeyboardArrows autoPlay className='relative z-0'>
                 {imageElements}
             </Carousel>
         </div>

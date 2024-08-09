@@ -165,3 +165,20 @@ input[type=range].slider:active::-webkit-slider-thumb {
 input[type=range].slider:active::-moz-range-thumb {
     background: #4400ff;
 }
+
+
+.image-container {
+    max-height: 300px; /* Altura fixa para o contêiner de imagem */
+    overflow: hidden; /* Esconder qualquer parte da imagem que ultrapasse o contêiner */
+    display: flex; /* Centralizar a imagem */
+    align-items: start; /* Centralizar verticalmente */
+    justify-content: center; /* Centralizar horizontalmente */
+    background-color: #f8f8f8; /* Cor de fundo para áreas vazias */
+    background-position: 0;
+}
+
+.image-container img {
+    width: 100%;
+
+    object-fit: fill; /* Exibe a imagem completa, ajustando dentro do contêiner */
+}

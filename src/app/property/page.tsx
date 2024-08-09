@@ -3,8 +3,11 @@ import { useEffect, useState, FormEvent } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import { Env } from "@/lib/Env";
 import { instance as axios } from "@/lib/axiosConfig";
+import { useRouter } from 'next/navigation';  // Importação para redirecionamento
 import 'react-toastify/dist/ReactToastify.css';
 
+
+import { FaImage } from "react-icons/fa";
 import { IoIosRemoveCircle } from "react-icons/io";
 
 type ApiResponse<T> = {
@@ -30,6 +33,9 @@ export default function Page() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [properties, setProperties] = useState<Property[]>([]);
     const [showUploadForm, setShowUploadForm] = useState<boolean>(false);
+    const [isUploading, setIsUploading] = useState<boolean>(false);  // Estado para controlar o upload
+
+    const router = useRouter();  // Uso do router para redirecionamento
 
     useEffect(() => {
         const id = localStorage.getItem("id");
@@ -109,6 +115,7 @@ export default function Page() {
 
     const handleFileUpload = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setIsUploading(true);  // Desabilitar o botão de upload
 
         if (selectedFiles && propertyId) {
             let anyFileTooLarge = false;
@@ -122,6 +129,7 @@ export default function Page() {
                     anyFileTooLarge = true;
                     const fileSizeInMB = (file.size / (1024 * 1024)).toFixed(2);
                     setErrorMessage(`File "${file.name}" (${fileSizeInMB}MB) exceeds the maximum allowable size of 3MB.`);
+                    setIsUploading(false);  // Reabilitar o botão de upload
                     break;
                 }
                 formData.append('files', file);
@@ -138,19 +146,23 @@ export default function Page() {
                     },
                 });
 
-                if (response.data.status === 'success') {
+                if (response.data.message === 'success') {
                     toast.success(response.data.message);
+                    router.push('/property/myproperties');  // Redirecionar para a página desejada
                 } else {
-                    toast.error(response.data.message);
+                    toast.success(response.data.message);
                 }
 
                 console.log('Upload successful:', response.data);
             } catch (error: any) {
                 console.error('Error uploading files:', error);
                 toast.error(error.response?.data?.message || 'Failed to upload files');
+            } finally {
+                setIsUploading(false);  // Reabilitar o botão de upload
             }
         } else {
             console.error('No files selected or property ID missing.');
+            setIsUploading(false);  // Reabilitar o botão de upload
         }
     };
 
@@ -203,7 +215,7 @@ export default function Page() {
                                     name="description"
                                     id="description"
                                 ></textarea>
-    
+
                                 <div className="flex flex-col md:flex-row gap-4">
                                     <div className="flex flex-col gap-4 w-full md:w-1/2">
                                         <label htmlFor="address">Address</label>
@@ -226,7 +238,7 @@ export default function Page() {
                                         />
                                     </div>
                                 </div>
-    
+
                                 <div className="flex flex-col md:flex-row gap-4">
                                     <div className="flex flex-col gap-4 w-full md:w-1/2">
                                         <label htmlFor="city">City</label>
@@ -272,9 +284,9 @@ export default function Page() {
                                     <option value="RENT">Rent</option>
                                     <option value="SELL">Sell</option>
                                 </select>
-    
+
                             </div>
-    
+
                             <div className="flex flex-col gap-4 w-full lg:w-1/2">
                                 <div className="flex flex-col md:flex-row gap-4">
                                     <div className="flex flex-col gap-4 w-full md:w-1/2">
@@ -301,7 +313,7 @@ export default function Page() {
                                         </select>
                                     </div>
                                 </div>
-    
+
                                 <div className="flex flex-col md:flex-row gap-4">
                                     <div className="flex flex-col gap-4 w-full md:w-1/3">
                                         <label htmlFor="rooms">Rooms</label>
@@ -337,7 +349,7 @@ export default function Page() {
                                         />
                                     </div>
                                 </div>
-    
+
                                 <label htmlFor="externalArea" className="flex items-center my-4">
                                     <input
                                         type="checkbox"
@@ -347,7 +359,7 @@ export default function Page() {
                                     />
                                     External Area
                                 </label>
-    
+
                                 <div className="flex flex-col md:flex-row gap-4">
                                     <div className="flex flex-col gap-4 w-full md:w-1/2">
                                         <label htmlFor="electricityFee">Electricity Fee</label>
@@ -372,7 +384,7 @@ export default function Page() {
                                         />
                                     </div>
                                 </div>
-    
+
                                 <div className="flex flex-col md:flex-row gap-4">
                                     <div className="flex flex-col gap-4 w-full md:w-1/2">
                                         <label htmlFor="rubbishFee">Rubbish Fee</label>
@@ -397,7 +409,7 @@ export default function Page() {
                                         />
                                     </div>
                                 </div>
-    
+
                                 <label htmlFor="timeRefundDeposit">Time Refund Deposit</label>
                                 <input
                                     type="number"
@@ -407,7 +419,7 @@ export default function Page() {
                                     id="timeRefundDeposit"
                                     min="0"
                                 />
-    
+
                                 <div className="flex flex-col md:flex-row gap-4">
                                     <div className="flex flex-col gap-4 w-full md:w-1/2">
                                         <label htmlFor="availableAtInit">Available At Init</label>
@@ -434,7 +446,7 @@ export default function Page() {
                                 </button>
                             </div>
                         </div>
-                        
+
                     </form>
                     {/* Esse formulário deverá aparecer no lugar do formulário acima, porem é importante trabalhar as dimensões para todos os dispositivos e torná-los responsivos. */}
                     <div className="flex flex-col w-full flex-shrink-0">
@@ -446,9 +458,7 @@ export default function Page() {
                             <form onSubmit={handleFileUpload} className="flex flex-col items-center p-4 border-2 border-dashed border-blue-400 rounded-lg bg-white shadow-lg w-full">
                                 <input type="hidden" name="publicId" value={propertyId} />
                                 <div className="flex flex-col items-center justify-center w-full h-48 cursor-pointer" onClick={() => document.getElementById('fileInput')?.click()}>
-                                    <svg className="w-12 h-12 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M16.88 3.549a.999.999 0 00-1.39-.282L10 7.588 4.51 3.267A1 1 0 003.118 4.51l5 4.318V15a1 1 0 102 0v-6.172l4.882-4.048a.998.998 0 00.278-1.39z"></path>
-                                    </svg>
+                                <FaImage />
                                     <p className="mt-2 text-sm text-gray-500">Browse Files to upload</p>
                                 </div>
                                 <input
@@ -462,22 +472,24 @@ export default function Page() {
                                 />
                                 <div className="w-full mt-4 p-2 bg-blue-50 rounded-lg flex items-center justify-between">
                                     <div className="flex items-center">
-                                        <svg className="w-6 h-6 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M8 12a4 4 0 100-8 4 4 0 000 8zm-2 2a6 6 0 0112 0v1H6v-1zm9 1h3v2H2v-2h3v-1a6 6 0 0112 0v1z"></path>
-                                        </svg>
+                                        <FaImage />
                                         <span className="text-sm text-gray-500">
                                             {selectedFiles ? `${selectedFiles.length} file(s) selected` : "No selected File"}
                                         </span>
                                     </div>
                                     {selectedFiles && (
                                         <button type="button" className="text-gray-400 hover:text-gray-600" onClick={() => setSelectedFiles(null)}>
-                                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fillRule="evenodd" d="M6 2a1 1 0 011-1h6a1 1 0 011 1v1h1a2 2 0 012 2v1H4V4a2 2 0 012-2h1V2zm2 5a1 1 0 012 0v8a1 1 0 11-2 0V7zm4 0a1 1 0 112 0v8a1 1 0 11-2 0V7z" clipRule="evenodd"></path>
-                                            </svg>
+                                            <FaImage />
                                         </button>
                                     )}
                                 </div>
-                                <button type="submit" className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">Upload</button>
+                                <button
+                                    type="submit"
+                                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700"
+                                    disabled={isUploading}  // Desabilitar botão se estiver fazendo upload
+                                >
+                                    {isUploading ? 'Uploading...' : 'Upload'}
+                                </button>
                             </form>
                         )}
                         {selectedFiles && (
@@ -505,19 +517,17 @@ export default function Page() {
                 {errorMessage && <p className="text-red-500">{errorMessage}</p>}
             </div>
             <ToastContainer
-                            position="top-right"
-                            autoClose={5000}
-                            hideProgressBar={false}
-                            newestOnTop={false}
-                            closeOnClick
-                            rtl={false}
-                            pauseOnFocusLoss
-                            draggable
-                            pauseOnHover
-                            theme="dark"
-                        />
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+            />
         </div>
     );
-    
-    
 }
